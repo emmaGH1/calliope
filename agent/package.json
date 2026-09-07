@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "probe": "tsx src/spikes/sibyl-probe.ts"
+    "probe": "tsx src/spikes/sibyl-probe.ts",
+    "org": "tsx src/org/session.ts"
   },
   "keywords": [],
   "author": "",
