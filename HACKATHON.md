@@ -95,23 +95,24 @@
 | Multiplier ×1.25 | Virtuals ACP jobs + Base settlement both real | named stacks on build page + tx evidence | build page | Unknown until spike A |
 
 ## Current execution
-- Current objective / owner: desk UI + ACP port — agent
+- Current objective / owner: submission hardening — agent; user-gated: repo push, video, posts, build page
 - Working state / verified commands and links:
-  - `cd agent && npm run probe` / `probe -- --recall-only` — Sibyl MCP write +
-    fresh-process recall VERIFIED (works pre-activation; local SQLite)
-  - `npm run org -- task` (twice across processes), `-- amnesic-task`,
-    `wipe` — all four demo beats VERIFIED on real memory (commit 2)
-  - hire seam: SimHirePort labeled SIM; AcpHirePort to plug into
-    agent/src/org/hire.ts once registration exists
-- Next concrete action: desk UI (Monad tokens from DESIGN.md) wired to a
-  local event stream; then AcpHirePort when user registers 3 agents
-- Checkpoint and feature-freeze timing: freeze optional scope at Sep 9 noon UTC
-- Largest current threat to placement: ACP registration still pending on user;
-  without it the multiplier caps at x1.15 (sim port keeps the demo honest)
-- Blocker / fallback: LLM key (stub model makes demo legible meanwhile);
-  ACP registration pending; fallback = sim port + honest labeling
-- Deferred ideas / accepted scope tradeoffs: third-party vendor hires (post-
-  freeze); desk auth; multi-tenant orgs
+  - `cd agent && npm test` — deletion test, 18/18 checks VERIFIED (spawns real processes)
+  - Desk UI built + production build green; running locally on
+    http://localhost:3737 (found/dispatch/wipe/amnesic; Monad tokens per DESIGN.md)
+  - AcpHirePort typed against acp-node-v2 real types; env-gated (CHARTER_*/VENDOR_*);
+    SIM default, honestly labeled. Typecheck clean
+  - README (memory note, honesty table, prior-work), docs/DEMO_SCRIPT.md,
+    docs/SUBMISSION.md, docs/POSTS.md (2 drafts), agent/.env.example — written
+  - commits: 7f5a74a 778abb2 592b3e8 48937b0 (+ docs commit)
+- Next concrete action (user): push public repo, record demo per script, post 2×,
+  fill build page + mark ready before Sep 10 23:59 UTC (internal 20:00 cutoff)
+- Checkpoint and feature-freeze timing: feature freeze reached ~Sep 9 (core + desk + docs)
+- Largest current threat to placement: ×1.25 multiplier hinges on live ACP run —
+  registration + wallet funding are user-side; sim port keeps everything else honest
+- Blocker / fallback: LLM key (stub labeled); ACP pending; fallback = sim port
+- Deferred ideas / accepted scope tradeoffs: real-LLM take; real-ACP take;
+  third-party vendor hires; desk deploys (local control surface by design)
 
 ## Submission
 - Form, video/slides, README, access status: not started; build-page link held by user
