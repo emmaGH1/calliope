@@ -87,7 +87,7 @@
 ## Evidence
 | Criterion | Claim | Actual evidence | Judge access path | Status / limitation |
 | --- | --- | --- | --- | --- |
-| Memory load-bearing (40) | Removing Sibyl dissolves the org (no roles/routes/standards/obligations reconstitute) | Deletion test as automated test + filmed kill-all/reboot side-by-side | repo test + demo video segment | Unknown until built |
+| Memory load-bearing (40) | Removing Sibyl dissolves the org (no roles/routes/standards/obligations reconstitute) | VERIFIED via session.ts: amnesic control sends bare briefs, empty vendor book, no ban knowledge; real memory reconstitutes all of it (commit 778abb2). Filmed side-by-side pending | repo test + demo video segment | Sim vendor outputs; ACP port pending |
 | Innovation (25) | Memory as the institution, not the notebook; absorbs grudge/continuity mechanics as subsystems | README memory note + architecture diagram | README | Unknown until built |
 | Execution (20) | Real escrow/payment txs on Base | tx hashes + explorer links in job log | desk UI + repo | Unknown until spike A |
 | Pitch (15) | Fresh-session recall unmistakable | 2–5 min video, unedited restart segment with clock | demo video on build page | Unknown until recorded |
@@ -95,16 +95,23 @@
 | Multiplier ×1.25 | Virtuals ACP jobs + Base settlement both real | named stacks on build page + tx evidence | build page | Unknown until spike A |
 
 ## Current execution
-- Current objective / owner: day-1 spikes (Sibyl recall; ACP hello-world job) — agent
-- Working state / verified commands and links: scaffold only; toolchain verified
-  (Node 24.16, npm 11.13, Python 3.11.15, uv 0.11.32, git 2.54)
-- Next concrete action: install Sibyl CLI + acp-node-v2; run both spikes
+- Current objective / owner: desk UI + ACP port — agent
+- Working state / verified commands and links:
+  - `cd agent && npm run probe` / `probe -- --recall-only` — Sibyl MCP write +
+    fresh-process recall VERIFIED (works pre-activation; local SQLite)
+  - `npm run org -- task` (twice across processes), `-- amnesic-task`,
+    `wipe` — all four demo beats VERIFIED on real memory (commit 2)
+  - hire seam: SimHirePort labeled SIM; AcpHirePort to plug into
+    agent/src/org/hire.ts once registration exists
+- Next concrete action: desk UI (Monad tokens from DESIGN.md) wired to a
+  local event stream; then AcpHirePort when user registers 3 agents
 - Checkpoint and feature-freeze timing: freeze optional scope at Sep 9 noon UTC
-- Largest current threat to placement: ACP friction burning day 1 (fallback ready)
-- Blocker / fallback: user-side sign-ins (sibyl auth, ACP registration, LLM key)
-  needed for full loop; local stubs unblocked meanwhile. ACP failure → x402 path
-- Deferred ideas / accepted scope tradeoffs: hiring real third-party ACP agents
-  (stretch, disclose anyway); mainnet stamps; multi-client support
+- Largest current threat to placement: ACP registration still pending on user;
+  without it the multiplier caps at x1.15 (sim port keeps the demo honest)
+- Blocker / fallback: LLM key (stub model makes demo legible meanwhile);
+  ACP registration pending; fallback = sim port + honest labeling
+- Deferred ideas / accepted scope tradeoffs: third-party vendor hires (post-
+  freeze); desk auth; multi-tenant orgs
 
 ## Submission
 - Form, video/slides, README, access status: not started; build-page link held by user

@@ -1,16 +1,15 @@
 /**
  * One Charter session per process invocation — restarts are REAL restarts.
  *
- *   npx tsx src/org/session.ts boot          -> found or reconstitute, report
- *   npx tsx src/org/session.ts task          -> boot + run one task, print decisions
- *   npx tsx src/org/session.ts amnesic-task  -> same task, memory calls stubbed (deletion test)
- *   npx tsx src/org/session.ts wipe          -> forget the org (demo beat 3)
+ *   npx tsx src/org/session.ts boot                  -> found or reconstitute, report
+ *   npx tsx src/org/session.ts found "Mission text"  -> found the org from a paragraph
+ *   npx tsx src/org/session.ts task ["text" [budget]]-> boot + run one task, print decisions
+ *   npx tsx src/org/session.ts amnesic-task          -> same task, memory calls stubbed (deletion test)
+ *   npx tsx src/org/session.ts wipe                  -> forget the org (demo beat 3)
  *
- * The demo story across invocations:
- *   task (session 1: founded, explores, gets burned, bans vendor)
- *   task (session 2: reconstituted, dodges banned vendor, attaches standards)
- *   amnesic-task      -> control: no memory, no charter, no vendor book
- *   wipe              -> boot reports "founded" again — the org was gone
+ * Add --json to also emit machine-readable events on stdout (used by the
+ * deletion test); every invocation appends the same events to events.jsonl
+ * for the desk UI.
  */
 import "dotenv/config";
 import { SibylMemory } from "../memory/sibyl.js";
@@ -18,9 +17,13 @@ import { boot, AmnesicMemory } from "../org/boot.js";
 import { OrgMemory } from "../org/memory-schema.js";
 import { SimHirePort } from "../org/hire.js";
 import { runTask } from "../org/run-task.js";
+import { EventLog } from "../org/event-log.js";
 import type { MemoryIo } from "../org/types.js";
 
-const cmd = process.argv[2] ?? "boot";
+const argv = process.argv.slice(2);
+const positionals = argv.filter((a) => !a.startsWith("--"));
+const cmd = positionals[0] ?? "boot";
+const log = new EventLog();
 
 function print(mem: MemoryIo, s: string) {
   console.log(`[${mem instanceof AmnesicMemory ? "AMNESIC" : "charter"}] ${s}`);
@@ -53,40 +56,49 @@ async function main() {
         await mem.forget("obligation", o.id, "demo: wipe the org");
       }
       await mem.recordEvent("wipe", { what: "org wiped for deletion demo" });
+      log.emit("wipe", "org wiped. next boot will be a founding with nothing behind it.");
       print(mem, "org wiped. next boot will be a founding with nothing behind it.");
       return;
     }
 
-    const report = await boot(mem);
-    print(
-      mem,
-      report.founded
-        ? `FOUNDED org (${report.rolesLoaded.length} roles, ${report.vendorsLoaded.length} vendors) — charter written to memory`
-        : `RECONSTITUTED org from memory: ${report.rolesLoaded.length} roles, ${report.vendorsLoaded.length} vendors, ${report.obligationsResumed.length} obligation(s) resumed`
-    );
-    if (report.vendorsLoaded.length) {
-      for (const v of report.vendorsLoaded) {
-        print(
-          mem,
-          `  vendor ${v.name}: quality=${v.quality ?? "?"} rate=$${v.rate.toFixed(2)} jobs=${v.jobs} failures=${v.failures}${v.banned ? " [BANNED]" : ""}`
-        );
-      }
+    const seed =
+      cmd === "found"
+        ? {
+            mission: positionals.slice(1).join(" ") || undefined,
+            standards: ["Brand voice outranks literal accuracy", "No machine-output artifacts"],
+          }
+        : undefined;
+    const report = await boot(mem, seed);
+    if (report.founded) {
+      log.emit("founded", `FOUNDED org (${report.rolesLoaded.length} roles, ${report.vendorsLoaded.length} vendors) — charter written to memory`, { seed: seed?.mission ?? null });
+      print(mem, `FOUNDED org (${report.rolesLoaded.length} roles, ${report.vendorsLoaded.length} vendors) — charter written to memory`);
+    } else {
+      log.emit("reconstituted", `RECONSTITUTED org from memory: ${report.rolesLoaded.length} roles, ${report.vendorsLoaded.length} vendors, ${report.obligationsResumed.length} obligation(s) resumed`, { resumed: report.obligationsResumed });
+      print(mem, `RECONSTITUTED org from memory: ${report.rolesLoaded.length} roles, ${report.vendorsLoaded.length} vendors, ${report.obligationsResumed.length} obligation(s) resumed`);
+    }
+    for (const v of report.vendorsLoaded) {
+      log.emit("vendor", `vendor ${v.name}: quality=${v.quality ?? "?"} rate=$${v.rate.toFixed(2)} jobs=${v.jobs} failures=${v.failures}${v.banned ? " [BANNED]" : ""}`, v);
+      print(
+        mem,
+        `  vendor ${v.name}: quality=${v.quality ?? "?"} rate=$${v.rate.toFixed(2)} jobs=${v.jobs} failures=${v.failures}${v.banned ? " [BANNED]" : ""}`
+      );
     }
 
     if (cmd === "task" || cmd === "amnesic-task") {
+      const taskText = positionals[1] ?? "Localize the landing page hero to Japanese. Keep the brand voice.";
+      const budget = positionals[2] ? Number(positionals[2]) : 3;
       const hire = new SimHirePort();
+      log.emit("hire-port", `hire port: ${hire.label}`, { label: hire.label });
       print(mem, `hire port: ${hire.label}`);
-      const result = await runTask(
-        mem,
-        hire,
-        { task: "Localize the landing page hero to Japanese. Keep the brand voice.", budget: 3 },
-        {}
-      );
+      const result = await runTask(mem, hire, { task: taskText, budget }, {});
+      log.emit("obligation", `obligation ${result.obligationId} -> ${result.vendor} spend=$${result.spend.toFixed(2)}`, { id: result.obligationId, vendor: result.vendor, spend: result.spend });
       print(mem, `obligation ${result.obligationId} -> ${result.vendor} spend=$${result.spend.toFixed(2)}`);
       for (const d of result.decisions) {
+        log.emit("decision", d.choice, d);
         print(mem, `  decision: ${d.choice}`);
         print(mem, `    because: ${d.because}  [source: ${d.source}]`);
       }
+      log.emit("deliverable", result.deliverable, { deliverable: result.deliverable });
       print(mem, `deliverable: ${result.deliverable}`);
     }
   } finally {

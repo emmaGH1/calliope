@@ -74,11 +74,15 @@ const SEED_VENDORS: VendorRecord[] = [
 /**
  * Boot the org. If charter/mission is absent, this is a founding: write the
  * charter, roles, and vendor book INTO MEMORY — they were never in code.
+ * A desk-supplied seed (mission paragraph + standards) founds a custom org.
  * If present, this is a reconstitution: read everything back and resume
  * unfinished obligations. With an amnesic memory, the org is always "founded"
  * and remembers nothing — the deletion test's control group.
  */
-export async function boot(mem: MemoryIo): Promise<BootReport> {
+export async function boot(
+  mem: MemoryIo,
+  seed?: { name?: string; mission?: string; standards?: string[] }
+): Promise<BootReport> {
   const org = new OrgMemory(mem);
   const report: BootReport = {
     founded: false,
@@ -91,7 +95,13 @@ export async function boot(mem: MemoryIo): Promise<BootReport> {
   const mission = await org.getMission();
   if (!mission) {
     report.founded = true;
-    await org.setMission({ ...SEED_MISSION, foundedAt: new Date().toISOString() });
+    await org.setMission({
+      ...SEED_MISSION,
+      ...(seed?.name ? { name: seed.name } : {}),
+      ...(seed?.mission ? { mission: seed.mission } : {}),
+      ...(seed?.standards ? { clientStandards: seed.standards } : {}),
+      foundedAt: new Date().toISOString(),
+    });
     for (const r of SEED_ROLES) await org.setRole(r);
     for (const v of SEED_VENDORS) await org.setVendor(v);
     await org.event("founding", { by: "boot", roles: SEED_ROLES.length });

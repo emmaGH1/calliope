@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "probe": "tsx src/spikes/sibyl-probe.ts",
-    "org": "tsx src/org/session.ts"
+    "org": "tsx src/org/session.ts",
+    "test": "tsx test/deletion-test.ts"
   },
   "keywords": [],
   "author": "",
