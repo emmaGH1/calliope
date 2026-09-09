@@ -46,7 +46,14 @@ export async function POST(req: Request) {
     const tail = readTail(AGENT, 3);
     events.push(...tail);
   }
-  return Response.json({ ok, cmd, events, status: r.status, stderr: r.stderr?.slice(0, 500) ?? null });
+  return Response.json({
+    ok,
+    cmd,
+    events,
+    status: r.status,
+    error: r.error?.message ?? null,
+    stderr: r.stderr?.slice(0, 500) ?? null,
+  });
 }
 
 export function readTail(AGENT: string, n: number): OrgEvent[] {
