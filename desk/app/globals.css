@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  /* Monad palette (DESIGN.md) */
+  --color-parchment: #f6f3f1;
+  --color-lake-blue: #2b59d1;
+  --color-periwinkle-mist: #cfdaf5;
+  --color-off-black: #242424;
+  --color-graphite: #4e4d4d;
+  --color-smoke: #797776;
+  --color-ash: #cecac8;
+  --color-coral: #ff9473;
+  --color-mint: #a7fccd;
+  --color-gold: #ecda98;
+
+  --font-mono-ui: ui-monospace, "JetBrains Mono", "IBM Plex Mono", "Space Mono",
+    SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-serif-ed: Georgia, Cambria, "Times New Roman", Times, serif;
+}
+
+body {
+  background: var(--color-parchment);
+  color: var(--color-off-black);
+}

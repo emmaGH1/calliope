@@ -16,6 +16,7 @@ import { SibylMemory } from "../memory/sibyl.js";
 import { boot, AmnesicMemory } from "../org/boot.js";
 import { OrgMemory } from "../org/memory-schema.js";
 import { SimHirePort } from "../org/hire.js";
+import { hirePortForEnv } from "../org/acp-hire.js";
 import { runTask } from "../org/run-task.js";
 import { EventLog } from "../org/event-log.js";
 import type { MemoryIo } from "../org/types.js";
@@ -87,8 +88,8 @@ async function main() {
     if (cmd === "task" || cmd === "amnesic-task") {
       const taskText = positionals[1] ?? "Localize the landing page hero to Japanese. Keep the brand voice.";
       const budget = positionals[2] ? Number(positionals[2]) : 3;
-      const hire = new SimHirePort();
-      log.emit("hire-port", `hire port: ${hire.label}`, { label: hire.label });
+      const { port: hire, real } = hirePortForEnv();
+      log.emit("hire-port", `hire port: ${hire.label}${real ? "" : " (real ACP activates with CHARTER_* env)"}`, { label: hire.label, real });
       print(mem, `hire port: ${hire.label}`);
       const result = await runTask(mem, hire, { task: taskText, budget }, {});
       log.emit("obligation", `obligation ${result.obligationId} -> ${result.vendor} spend=$${result.spend.toFixed(2)}`, { id: result.obligationId, vendor: result.vendor, spend: result.spend });
