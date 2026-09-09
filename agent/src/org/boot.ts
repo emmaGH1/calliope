@@ -36,13 +36,13 @@ const SEED_ROLES: Role[] = [
     name: "editor",
     mandate: "Produce localized copy that satisfies the charter standards.",
     routes: [{ on: "draft ready", to: "qa" }],
-    model: { provider: "stub", model: "n/a" },
+    model: { provider: "openai", model: "gpt-4o-mini" },
   },
   {
     name: "qa",
     mandate: "Grade drafts against charter standards; fail drafts with notes.",
     routes: [{ on: "pass", to: "coordinator", note: "release payment" }],
-    model: { provider: "stub", model: "n/a" },
+    model: { provider: "openai", model: "gpt-4o-mini" },
   },
 ];
 

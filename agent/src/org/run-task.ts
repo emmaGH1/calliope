@@ -1,29 +1,38 @@
-import type { Decision, MemoryIo, TaskResult } from "./types.js";
+import type { Decision, MemoryIo, TaskResult, VendorRecord } from "./types.js";
 import { OrgMemory } from "./memory-schema.js";
 import type { HirePort } from "./hire.js";
 import { pickVendor } from "./hire.js";
 import { modelFor } from "./model.js";
-import type { ModelPort } from "./model.js";
 
 /**
- * The org's unit of work: create an obligation, route it through roles,
- * consult the vendor book for external hires, grade against the charter
- * standards, pay, and write what was learned back into memory.
+ * The org's unit of work, split so interruption is REAL:
+ *   openObligation() — write the in_progress obligation (brief, standards, budget)
+ *   completeObligation() — roles read from memory, hire, QA, rule, learn
  *
- * Every decision returns a `because` chip citing the memory it read —
- * that is the load-bearing provenance the desk UI renders.
+ * A process that dies between them leaves recoverable state in memory; the
+ * next session's task command resumes and finishes it.
+ *
+ * Load-bearing reads: charter (standards), roles (qa/editor mandates + model
+ * choice — missing roles refuse the task), vendor book (who to hire), journal
+ * (prior failures fed to QA). Every decision cites its memory source.
  */
-export async function runTask(
-  mem: MemoryIo,
-  hire: HirePort,
-  input: { task: string; budget: number },
-  opts: { quality?: number } = {}
-): Promise<TaskResult> {
-  const org = new OrgMemory(mem);
-  const decisions: Decision[] = [];
-  const id = `obl-${Date.now().toString(36)}`;
 
-  // 1. The charter defines the standards. No charter, no standards.
+export interface RunContext {
+  mem: MemoryIo;
+  hire: HirePort;
+}
+
+function vendorNameFor(v: VendorRecord | null): string {
+  return v?.name ?? "editor(internal)";
+}
+
+/** Write the obligation and attach the brief. Returns the obligation id. */
+export async function openObligation(
+  mem: MemoryIo,
+  input: { task: string; budget: number },
+  decisions: Decision[]
+): Promise<string> {
+  const org = new OrgMemory(mem);
   const mission = await org.getMission();
   const standards = mission?.clientStandards ?? [];
   decisions.push({
@@ -34,8 +43,8 @@ export async function runTask(
     source: "charter/mission",
   });
 
-  // 2. Create the obligation in memory (survives restarts mid-flight).
-  const startedAt = new Date().toISOString();
+  const id = `obl-${Date.now().toString(36)}`;
+  const now = new Date().toISOString();
   await org.setObligation({
     id,
     task: input.task,
@@ -43,20 +52,60 @@ export async function runTask(
     budget: input.budget,
     status: "in_progress",
     spend: 0,
-    createdAt: startedAt,
-    updatedAt: startedAt,
+    createdAt: now,
+    updatedAt: now,
   });
+  return id;
+}
 
-  // 3. Consult the vendor book (memory), then hire via the market port.
+/** Does this task have an interrupted predecessor in memory? */
+export async function findResumable(
+  mem: MemoryIo
+): Promise<{ id: string; task: string; status: string } | null> {
+  const org = new OrgMemory(mem);
+  const open = (await org.listObligations()).filter(
+    (o) => o.status === "in_progress"
+  );
+  return open.length ? open[open.length - 1] : null;
+}
+
+export async function completeObligation(
+  ctx: RunContext,
+  input: { task: string; budget: number },
+  id: string,
+  decisions: Decision[]
+): Promise<TaskResult> {
+  const { mem, hire } = ctx;
+  const org = new OrgMemory(mem);
+
+  // 1. Roles are the org chart IN MEMORY. No roles -> the org cannot route work.
+  const roles = await org.listRoles();
+  const qaRole = roles.find((r) => r.name === "qa");
+  const editorRole = roles.find((r) => r.name === "editor");
+  if (!qaRole || !editorRole) {
+    decisions.push({
+      choice: "task refused — no roles in memory",
+      because: `roles found: ${roles.length}; the org cannot route work without its qa/editor charter roles`,
+      source: "role/* in memory",
+    });
+    const o = await org.getObligation(id);
+    if (o) {
+      o.status = "failed";
+      await org.setObligation(o);
+    }
+    await org.event("refusal", { id, why: "no roles in memory" });
+    return { obligationId: id, deliverable: "(task refused)", vendor: "(none)", spend: 0, decisions };
+  }
+
+  // 2. Consult the vendor book (memory), then hire via the market port.
   const vendors = await org.listVendors();
   const pick = pickVendor(vendors, input.budget);
   decisions.push(...pick.decisions);
 
   let deliverable = "";
   let spend = 0;
-  const hiredName = pick.vendor?.name ?? "editor(internal)";
-
   if (pick.vendor) {
+    const standards = (await org.getMission())?.clientStandards ?? [];
     const out = await hire.hire(pick.vendor, { task: input.task, standards });
     deliverable = out.deliverable;
     spend = out.spend;
@@ -67,15 +116,41 @@ export async function runTask(
       pick.vendor.name
     );
   } else {
-    const model: ModelPort = modelFor({ provider: "stub", model: "n/a" });
-    deliverable = await model.complete(`ROLE: EDITOR\nQUALITY: ${opts.quality ?? 3}`, input.task);
+    const model = modelFor(editorRole.model);
+    deliverable = await model.complete(
+      `ROLE: EDITOR\nQUALITY: 3\nModel: ${model.label}`,
+      input.task
+    );
   }
 
-  // 4. QA grades against the charter standards (memory), not gut feel.
-  const model: ModelPort = modelFor({ provider: "stub", model: "n/a" });
-  const verdictRaw = await model.complete(
-    `ROLE: QA\nStandards: ${standards.join("; ") || "none"}`,
-    JSON.stringify({ draft: deliverable, vendor: hiredName })
+  // 3. QA: prompt assembled from the qa role's mandate (memory), the charter
+  //    standards (memory), and this vendor's prior failures (journal, memory).
+  const mission = await org.getMission();
+  const standards = mission?.clientStandards ?? [];
+  const vendorName = vendorNameFor(pick.vendor);
+  let priorFailures = 0;
+  if (pick.vendor) {
+    const v = await org.getVendor(pick.vendor.name);
+    priorFailures = v?.failures ?? 0;
+    // journal consult: only real journal-tier events count (archived entities
+    // from earlier orgs carry the same names and would muddy a fresh founding)
+    const journal = await mem.search(`${pick.vendor.name} FAIL`, 5);
+    const hits = ((journal as any).results ?? []).filter(
+      (h: any) => h.tier === "journal"
+    );
+    if (hits.length) {
+      decisions.push({
+        choice: `QA context: ${hits.length} journal ruling(s) on record for ${pick.vendor.name}`,
+        because: "journal search fed prior ruling notes into the QA brief",
+        source: "journal (memory_search)",
+      });
+    }
+  }
+
+  const qaModel = modelFor(qaRole.model);
+  const verdictRaw = await qaModel.complete(
+    `ROLE: QA\nMandate: ${qaRole.mandate}\nStandards: ${standards.join("; ") || "none"}`,
+    JSON.stringify({ draft: deliverable, standards, priorFailures, vendor: vendorName })
   );
   let verdict: { pass: boolean; issues: string[] };
   try {
@@ -85,44 +160,44 @@ export async function runTask(
   }
   decisions.push({
     choice: verdict.pass ? "QA: pass" : `QA: fail (${verdict.issues.join(", ")})`,
-    because: "graded against charter/mission clientStandards",
-    source: "charter/mission",
+    because: "graded by qa role mandate vs charter/mission clientStandards",
+    source: "role/qa + charter/mission",
   });
 
-  // 5. Rule + learn. Payment and the vendor-book update are memory writes.
+  // 4. Rule + learn. Learned quality is a running average, written to the book.
   const obligation = await org.getObligation(id);
   if (verdict.pass) {
-    spend = Math.max(spend, 0);
     if (obligation) {
       obligation.status = "paid";
-      obligation.assignedTo = hiredName;
+      obligation.assignedTo = vendorName;
       obligation.spend = spend;
       await org.setObligation(obligation);
     }
     if (pick.vendor) {
       const v = await org.getVendor(pick.vendor.name);
       if (v) {
+        const prevJobs = v.jobs;
         v.jobs += 1;
-        v.quality = 5; // learned: this vendor passes our bar
+        v.quality = ((v.quality ?? 0) * prevJobs + 5) / (prevJobs + 1);
         v.notes.push(`job ${id}: pass`);
         await org.setVendor(v);
       }
     }
-    await org.event("ruling", { id, pass: true, spend, vendor: hiredName });
+    await org.event("ruling", { id, pass: true, spend, vendor: vendorName });
   } else {
     if (obligation) {
       obligation.status = "failed";
-      obligation.assignedTo = hiredName;
+      obligation.assignedTo = vendorName;
       await org.setObligation(obligation);
     }
     if (pick.vendor) {
       const v = await org.getVendor(pick.vendor.name);
       if (v) {
+        const prevJobs = v.jobs;
         v.jobs += 1;
         v.failures += 1;
-        v.quality = 2; // learned: this vendor fails our bar
+        v.quality = ((v.quality ?? 0) * prevJobs + 2) / (prevJobs + 1);
         v.notes.push(`job ${id}: FAIL ${verdict.issues.join("; ")}`);
-        // The grudge is one row in the vendor book — policy writes it, not code.
         if (v.failures >= 1 && v.quality < 3) {
           v.banned = true;
           await org.event("ban", { vendor: v.name, why: v.notes.at(-1) }, "vendor", v.name);
@@ -135,8 +210,20 @@ export async function runTask(
         await org.setVendor(v);
       }
     }
-    await org.event("ruling", { id, pass: false, vendor: hiredName });
+    await org.event("ruling", { id, pass: false, vendor: vendorName });
   }
 
-  return { obligationId: id, deliverable, vendor: hiredName, spend, decisions };
+  return { obligationId: id, deliverable, vendor: vendorName, spend, decisions };
+}
+
+/** Legacy single-shot entry (used by tests/spikes): open + complete. */
+export async function runTask(
+  mem: MemoryIo,
+  hire: HirePort,
+  input: { task: string; budget: number },
+  opts: { quality?: number } = {}
+): Promise<TaskResult> {
+  const decisions: Decision[] = [];
+  const id = await openObligation(mem, input, decisions);
+  return completeObligation({ mem, hire }, input, id, decisions);
 }

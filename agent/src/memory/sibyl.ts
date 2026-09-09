@@ -1,16 +1,20 @@
 import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 
 /**
  * Thin TS client for Sibyl Memory, spoken over stdio MCP.
  *
- * Server resolution order (first that can import sibyl_memory_mcp wins):
- *   1. SIBYL_PYTHON env → `python -m sibyl_memory_mcp`
- *   2. python / python3 / py -3 on PATH (probed via import check)
- *   3. sibyl-memory-mcp console script on PATH (uv tool / pip both expose it;
- *      wrapped in `cmd /c` on Windows so stdio stays a clean pipe)
- * Install: `uv tool install 'sibyl-memory-cli[mcp]'` (or pip). Works
+ * Server resolution order (first that can launch sibyl_memory_mcp wins):
+ *   1. SIBYL_PYTHON env → `<python> -m sibyl_memory_mcp`
+ *   2. the uv tool venv python (uv tool install 'sibyl-memory-cli[mcp]')
+ *   3. python / python3 / py -3 on PATH, if they can import the module
+ *   4. sibyl-memory-mcp console script on PATH (wrapped in cmd /c on win32
+ *      so stdio stays a clean pipe)
+ * Install docs: `uv tool install 'sibyl-memory-cli[mcp]'` or pip. Works
  * pre-activation — the store is local SQLite at ~/.sibyl-memory/memory.db.
  */
 interface ServerLaunch {
@@ -19,35 +23,51 @@ interface ServerLaunch {
 }
 
 function canImport(pythonCmd: string): boolean {
+  // no shell: spawn quotes args itself, so the '-c' payload survives intact
   const r = spawnSync(pythonCmd, ["-c", "import sibyl_memory_mcp"], {
     encoding: "utf8",
-    shell: true,
     timeout: 15_000,
   });
   return r.status === 0;
 }
 
 export function resolveSibylServer(): ServerLaunch {
-  const pythons = [
-    process.env.SIBYL_PYTHON,
-    "python",
-    "python3",
-    "py -3",
-  ].filter((p): p is string => !!p);
-  for (const p of pythons) {
-    if (canImport(p)) return { command: p, args: ["-m", "sibyl_memory_mcp"] };
+  const candidates: string[] = [];
+  if (process.env.SIBYL_PYTHON) candidates.push(process.env.SIBYL_PYTHON);
+  // uv tool venv location (win32 + posix layouts)
+  const uvTool = process.env.UV_TOOL_DIR
+    ? join(process.env.UV_TOOL_DIR, "sibyl-memory-cli")
+    : [
+        join(homedir(), "AppData", "Roaming", "uv", "tools", "sibyl-memory-cli"),
+        join(homedir(), ".local", "share", "uv", "tools", "sibyl-memory-cli"),
+      ].find((p) => existsSync(p));
+  if (uvTool) {
+    const venvPython =
+      existsSync(join(uvTool, "Scripts", "python.exe")) ? join(uvTool, "Scripts", "python.exe") : join(uvTool, "bin", "python");
+    if (existsSync(venvPython)) candidates.push(venvPython);
+  }
+  candidates.push("python", "python3", "py");
+  for (const p of candidates) {
+    const cmd = p === "py" ? "py" : p;
+    const probeArgs = p === "py" ? ["-3", "-c", "import sibyl_memory_mcp"] : ["-c", "import sibyl_memory_mcp"];
+    try {
+      const r = spawnSync(cmd, probeArgs, { encoding: "utf8", timeout: 15_000 });
+      if (r.status === 0) {
+        return p === "py"
+          ? { command: "py", args: ["-3", "-m", "sibyl_memory_mcp"] }
+          : { command: p, args: ["-m", "sibyl_memory_mcp"] };
+      }
+    } catch {}
   }
   if (process.platform === "win32") {
     const probe = spawnSync("cmd", ["/c", "sibyl-memory-mcp --help"], {
       encoding: "utf8",
-      shell: true,
       timeout: 15_000,
     });
     if (probe.status === 0) return { command: "cmd", args: ["/c", "sibyl-memory-mcp"] };
   } else {
     const probe = spawnSync("sibyl-memory-mcp", ["--help"], {
       encoding: "utf8",
-      shell: true,
       timeout: 15_000,
     });
     if (probe.status === 0) return { command: "sibyl-memory-mcp", args: [] };
@@ -95,9 +115,15 @@ export class SibylMemory {
     return this.call("memory_remember", { category, name, body });
   }
 
-  /** Exact lookup. Returns entity with body + created_at/updated_at, or NOT_FOUND. */
-  recall(category: string, name: string) {
-    return this.call("memory_recall", { category, name });
+  /** Exact lookup. Returns entity with body + created_at/updated_at, or {ok:false}. */
+  async recall(category: string, name: string) {
+    const r = await this.call("memory_recall", { category, name });
+    // server reports misses as a tool-error string, not JSON — normalize it
+    if (typeof r === "string") {
+      if (r.includes("NOT_FOUND")) return { ok: false, notFound: true, error: r };
+      return { ok: false, error: r };
+    }
+    return r;
   }
 
   /** FTS across all tiers (entity/state/reference/journal); zeros self-explain via verdict. */
