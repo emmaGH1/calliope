@@ -1,26 +1,70 @@
+import { spawnSync } from "node:child_process";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 
 /**
  * Thin TS client for Sibyl Memory, spoken over stdio MCP.
  *
- * The server process is the sibyl-memory-cli tool venv:
- *   <venv>/Scripts/python.exe -m sibyl_memory_mcp
- * Credentials live in ~/.sibyl-memory/credentials.json (created by `sibyl init`).
+ * Server resolution order (first that can import sibyl_memory_mcp wins):
+ *   1. SIBYL_PYTHON env → `python -m sibyl_memory_mcp`
+ *   2. python / python3 / py -3 on PATH (probed via import check)
+ *   3. sibyl-memory-mcp console script on PATH (uv tool / pip both expose it;
+ *      wrapped in `cmd /c` on Windows so stdio stays a clean pipe)
+ * Install: `uv tool install 'sibyl-memory-cli[mcp]'` (or pip). Works
+ * pre-activation — the store is local SQLite at ~/.sibyl-memory/memory.db.
  */
-const DEFAULT_SIBYL_PYTHON =
-  "C:\\Users\\Emma0\\AppData\\Roaming\\uv\\tools\\sibyl-memory-cli\\Scripts\\python.exe";
+interface ServerLaunch {
+  command: string;
+  args: string[];
+}
+
+function canImport(pythonCmd: string): boolean {
+  const r = spawnSync(pythonCmd, ["-c", "import sibyl_memory_mcp"], {
+    encoding: "utf8",
+    shell: true,
+    timeout: 15_000,
+  });
+  return r.status === 0;
+}
+
+export function resolveSibylServer(): ServerLaunch {
+  const pythons = [
+    process.env.SIBYL_PYTHON,
+    "python",
+    "python3",
+    "py -3",
+  ].filter((p): p is string => !!p);
+  for (const p of pythons) {
+    if (canImport(p)) return { command: p, args: ["-m", "sibyl_memory_mcp"] };
+  }
+  if (process.platform === "win32") {
+    const probe = spawnSync("cmd", ["/c", "sibyl-memory-mcp --help"], {
+      encoding: "utf8",
+      shell: true,
+      timeout: 15_000,
+    });
+    if (probe.status === 0) return { command: "cmd", args: ["/c", "sibyl-memory-mcp"] };
+  } else {
+    const probe = spawnSync("sibyl-memory-mcp", ["--help"], {
+      encoding: "utf8",
+      shell: true,
+      timeout: 15_000,
+    });
+    if (probe.status === 0) return { command: "sibyl-memory-mcp", args: [] };
+  }
+  throw new Error(
+    "sibyl_memory_mcp not found. Install Sibyl Memory first: uv tool install 'sibyl-memory-cli[mcp]' " +
+      "(or pip install 'sibyl-memory-cli[mcp]'), or point SIBYL_PYTHON at a python that has it."
+  );
+}
 
 export class SibylMemory {
   private client: Client | null = null;
   private transport: StdioClientTransport | null = null;
 
   async connect(): Promise<void> {
-    const python = process.env.SIBYL_PYTHON ?? DEFAULT_SIBYL_PYTHON;
-    this.transport = new StdioClientTransport({
-      command: python,
-      args: ["-m", "sibyl_memory_mcp"],
-    });
+    const { command, args } = resolveSibylServer();
+    this.transport = new StdioClientTransport({ command, args });
     this.client = new Client(
       { name: "charter-agent", version: "0.1.0" },
       { capabilities: {} }
