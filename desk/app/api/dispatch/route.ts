@@ -19,6 +19,7 @@ export async function POST(req: Request) {
   const args = ["tsx", "src/org/session.ts", "--json", cmd];
   if (cmd === "found" && body.mission) args.push(String(body.mission).slice(0, 500));
   if (cmd === "task") {
+    if (body.crash) args.push("--crash");
     if (body.text) args.push(String(body.text).slice(0, 300));
     if (body.budget) args.push(String(body.budget));
   }

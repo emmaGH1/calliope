@@ -87,7 +87,7 @@
 ## Evidence
 | Criterion | Claim | Actual evidence | Judge access path | Status / limitation |
 | --- | --- | --- | --- | --- |
-| Memory load-bearing (40) | Removing Sibyl dissolves the org (no roles/routes/standards/obligations reconstitute) | VERIFIED via session.ts: amnesic control sends bare briefs, empty vendor book, no ban knowledge; real memory reconstitutes all of it (commit 778abb2). Filmed side-by-side pending | repo test + demo video segment | Sim vendor outputs; ACP port pending |
+| Memory load-bearing (40) | Removing Sibyl dissolves the org (no roles/routes/standards/vendor book reconstitute; tasks refused, bans forgotten) | VERIFIED via session.ts + npm test: amnesic control cannot route; real memory reconstitutes charter/roles/vendors/obligations and resumes crashed work (commits a841973+). Filmed side-by-side pending | repo test + demo video segment | Sim vendor outputs; ACP port pending |
 | Innovation (25) | Memory as the institution, not the notebook; absorbs grudge/continuity mechanics as subsystems | README memory note + architecture diagram | README | Unknown until built |
 | Execution (20) | Real escrow/payment txs on Base | tx hashes + explorer links in job log | desk UI + repo | Unknown until spike A |
 | Pitch (15) | Fresh-session recall unmistakable | 2–5 min video, unedited restart segment with clock | demo video on build page | Unknown until recorded |
@@ -95,22 +95,24 @@
 | Multiplier ×1.25 | Virtuals ACP jobs + Base settlement both real | named stacks on build page + tx evidence | build page | Unknown until spike A |
 
 ## Current execution
-- Current objective / owner: submission hardening — agent; user-gated: repo push, video, posts, build page
+- Current objective / owner: submission hardening done; user-gated: repo push, video, posts, build page
 - Working state / verified commands and links:
-  - `cd agent && npm test` — deletion test, 18/18 checks VERIFIED (spawns real processes)
-  - Desk UI built + production build green; running locally on
-    http://localhost:3737 (found/dispatch/wipe/amnesic; Monad tokens per DESIGN.md)
-  - AcpHirePort typed against acp-node-v2 real types; env-gated (CHARTER_*/VENDOR_*);
-    SIM default, honestly labeled. Typecheck clean
-  - README (memory note, honesty table, prior-work), docs/DEMO_SCRIPT.md,
-    docs/SUBMISSION.md, docs/POSTS.md (2 drafts), agent/.env.example — written
-  - commits: 7f5a74a 778abb2 592b3e8 48937b0 (+ docs commit)
-- Next concrete action (user): push public repo, record demo per script, post 2×,
-  fill build page + mark ready before Sep 10 23:59 UTC (internal 20:00 cutoff)
-- Checkpoint and feature-freeze timing: feature freeze reached ~Sep 9 (core + desk + docs)
+  - `cd agent && npm test` — deletion test, 24/24 VERIFIED (real processes;
+    sections: founding/ban, reconstitution/citation/pass, amnesic collapse
+    incl. no-roles refusal, crash->resume; real recall-based persistence)
+  - Teardown fixes (Sep 9): portable Sibyl discovery (no machine paths);
+    roles load-bearing (task refuses without role/* entities); model config
+    lives in role entities (`set-model`); journal-citing QA; crash/resume;
+    recall() NOT_FOUND normalization; `reset --yes` for pristine takes
+  - Desk UI: charter panel + crash button + honest wipe wording; running on
+    http://localhost:3737 (rebuild after a841973)
+  - commits: 7f5a74a 778abb2 592b3e8 48937b0 7b79da1 cb41757 dad1b41 a841973 (+ docs)
+- Next concrete action (user): push public repo, record demo per script
+  (crash beat included), post 2x, fill build page + mark ready before
+  Sep 10 23:59 UTC (internal 20:00 cutoff)
 - Largest current threat to placement: ×1.25 multiplier hinges on live ACP run —
   registration + wallet funding are user-side; sim port keeps everything else honest
-- Blocker / fallback: LLM key (stub labeled); ACP pending; fallback = sim port
+- Blocker / fallback: LLM key (STUB fallback labeled); ACP pending; fallback = sim port
 - Deferred ideas / accepted scope tradeoffs: real-LLM take; real-ACP take;
   third-party vendor hires; desk deploys (local control surface by design)
 

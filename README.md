@@ -45,8 +45,10 @@ npm test                   # THE DELETION TEST — 18 assertions, ~30 s
 vendor; session 2 is a *fresh OS process* that reconstitutes the org from memory,
 **cites the ban by name**, hires the good vendor, attaches the charter standards,
 and passes QA; the control group runs the same task with **every memory call
-stubbed out** — bare brief, empty vendor book, QA fail. Delete Sibyl and there is
-no company: that is the load-bearing proof.
+stubbed out** — no charter, no roles (the task is refused), no vendor book;
+a fourth section **crashes a process mid-task** and shows a fresh boot resuming
+and finishing the interrupted obligation. Delete Sibyl and there is no company:
+that is the load-bearing proof.
 
 Then, for the human version:
 
@@ -70,11 +72,15 @@ uv tool install "sibyl-memory-cli[mcp]"     # or: pip install "sibyl-memory-cli[
 ```bash
 cd agent
 npm install
-npm test                        # deletion test (18 checks)
+npm test                        # deletion test (24 checks)
+npm run org -- reset --yes      # pristine local store (deletes memory.db)
 npm run org -- found "We localize client landing copy with the brand voice intact, on budget."
 npm run org -- task             # session 1: explores cheapest, fails QA, bans vendor
 npm run org -- task             # session 2 (fresh process): reconstitutes, dodges the ban, passes
-npm run org -- amnesic-task     # control: memory stubbed — the org is gone
+npm run org -- task --crash     # dies mid-task; the obligation stays in memory
+npm run org -- task             # fresh process RESUMES and finishes the interrupted job
+npm run org -- amnesic-task     # control: memory stubbed — the org cannot even route the task
+npm run org -- wipe             # forget the org (entities archived; journal residue remains)
 ```
 
 Optional env (`agent/.env`, copied from `agent/.env.example`):
@@ -84,7 +90,7 @@ Optional env (`agent/.env`, copied from `agent/.env.example`):
 | `OPENAI_API_KEY` / `XAI_API_KEY` | real LLM brains for editor/QA (default: deterministic STUB, labeled in output) |
 | `CHARTER_WALLET_ADDRESS`, `CHARTER_WALLET_ID`, `CHARTER_SIGNER_KEY`, `CHARTER_BUILDER_CODE` | real ACP hires (Virtuals Agent Commerce Protocol, escrow on Base) |
 | `VENDOR_WALLET_ADDRESS`, `VENDOR_OFFERING_NAME` | the vendor agent's registered offering |
-| `SIBYL_PYTHON` | path to the sibyl tool venv python (auto-detected default) |
+| `SIBYL_PYTHON` | override for the Sibyl server python. Default resolution probes: `SIBYL_PYTHON` → the `uv tool` venv python → `python`/`python3`/`py` (import check) → the `sibyl-memory-mcp` console script on PATH |
 
 ## Memory implementation note (what persists, recalls, and changes decisions)
 
@@ -96,26 +102,32 @@ All memory I/O goes through one typed client: [`agent/src/memory/sibyl.ts`](agen
 
 | Category | Entity | Holds | Written | Read |
 | --- | --- | --- | --- | --- |
-| `charter` | `mission` | name, mission, client standards, policies | founding (`boot.ts:98`) | every task (`run-task.ts:27`), boot |
-| `role` | coordinator, editor, qa | mandate + handoff routes | founding (`boot.ts:105`) | boot reconstitution (`boot.ts:114`) |
-| `vendor` | per-market-vendor | quality, rate, jobs, failures, notes, `banned` | founding; **every outcome** (`run-task.ts:108,135`) | vendor-book consult (`run-task.ts:51`), boot |
-| `obligation` | per-job | task, standards, budget, status, spend | task start (`run-task.ts:39`) + each ruling | boot resumes unfinished (`boot.ts:116`) |
-| journal | `memory_record_event` | founding/reconstitution/hire/ban/ruling | everywhere (append-only) | `memory_search` across tiers |
+| `charter` | `mission` | name, mission, client standards, policies | founding (`boot.ts:98`) | every task (`run-task.ts:36`), boot |
+| `role` | coordinator, editor, qa | mandate + handoff routes + **model config** | founding (`boot.ts:105`); `set-model` hot-swap | task routing — **missing roles refuse the task** (`run-task.ts:82`) |
+| `vendor` | per-market-vendor | quality (running avg), rate, jobs, failures, notes, `banned` | founding; **every outcome** (`run-task.ts:183,210`) | vendor-book consult (`run-task.ts:101`), boot |
+| `obligation` | per-job | task, standards, budget, status, spend | task open (`run-task.ts:48`) + each ruling | boot resume list (`boot.ts:116`); crash recovery via `findResumable` (`run-task.ts:62`) |
+| journal | `memory_record_event` | founding/reconstitution/hire/ban/ruling (append-only) | everywhere | **QA consults it** (`run-task.ts:137`) — prior rulings feed the verdict |
 
 **Read sites that change a decision** (the load-bearing ones):
-- `run-task.ts:27` — the charter defines the QA standards; no charter → brief sent bare.
-- `run-task.ts:51` — the vendor book (memory) decides *who* gets hired and *at what rate*;
+- `run-task.ts:36` — the charter defines the QA standards; no charter → brief sent bare.
+- `run-task.ts:82` — roles come from memory; **no qa/editor roles → the task is refused**.
+- `run-task.ts:101` — the vendor book (memory) decides *who* gets hired and *at what rate*;
   bans are remembered and cited (`hire.ts` `pickVendor`).
+- `run-task.ts:137` — QA feeds on journal rulings for the vendor (`memory_search`).
 - `boot.ts:114-116` — a fresh process only knows the org if memory reconstitutes it.
 
 **Write sites that change future sessions**:
-- `run-task.ts:108` (pass → quality 5) and `run-task.ts:128-135` (fail → quality 2,
-  failure note, **ban**), then `boot.ts:115` reads it back next process.
-- `run-task.ts:39` — obligations survive mid-task process death.
+- `run-task.ts:183` (pass → quality average up) and `run-task.ts:210` (fail → quality
+  average down, failure note, **ban**) — `boot.ts:115` reads them back next process.
+- `run-task.ts:48` — obligations survive process death; `run-task.ts:62` resumes them.
 
 **Deletion test**: `agent/src/org/boot.ts` `AmnesicMemory` is a `MemoryIo` whose every
 call is a no-op — booting and running on it is the wipe. `agent/test/deletion-test.ts`
-asserts the regression in 18 checks across real processes.
+asserts the regression in 24 checks across real processes, including real recall-based
+persistence proof (amnesic writes are verifiably absent; session writes are verifiably
+present). `npm run org -- reset --yes` deletes the local store for pristine takes —
+Sibyl's `wipe`/forget *archives* entities by design, and the append-only journal
+survives an entity wipe (Charter treats that residue as honest history; QA consults it).
 
 Notes a judge may appreciate: Sibyl wraps every recall in an untrusted-context
 fence and returns self-explaining verdicts on empty searches; we treat memory as
@@ -160,12 +172,14 @@ deliverable text.
 
 | Thing | State | Evidence |
 | --- | --- | --- |
-| Memory load-bearing (deletion test) | **VERIFIED** | `npm test`, 18/18 |
+| Memory load-bearing (deletion test) | **VERIFIED** | `npm test`, 24/24 |
 | Fresh-process reconstitution | **VERIFIED** | session pids differ; vendor book + ban intact |
+| Crash → resume of interrupted work | **VERIFIED** | `task --crash` then fresh `task` in `npm test` section 4 |
 | Decision provenance chips | **VERIFIED** | desk + `--json` output |
+| Roles & journal change decisions | **VERIFIED** | missing roles refuse the task; QA cites journal rulings |
 | Org founding from a paragraph | **VERIFIED** | `npm run org -- found "…"` |
 | Real ACP escrow job | **NOT RUN — needs agent registration + wallet funding (user-side)** | code compiles; sim port active |
-| LLM-backed editor/QA | **NOT RUN — needs an API key** | deterministic STUB model active, labeled |
+| LLM-backed editor/QA | **WIRED — NOT RUN without an API key** | role entities carry model config; STUB fallback labeled |
 | Vendor quality (atelier vs sloppy) | SIMULATED (labeled `SIM`, `skill` field documented) | honest — real vendors replace it in the ACP path |
 
 ## Prior Work declaration

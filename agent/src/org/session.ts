@@ -12,6 +12,8 @@
  *                                                     -> hot-swap a role's brain in memory
  *   npx tsx src/org/session.ts wipe                   -> forget the org (archives entities;
  *                                                        Sibyl keeps journal residue)
+ *   npx tsx src/org/session.ts reset --yes            -> delete the local memory.db entirely
+ *                                                        (pristine take for demos/tests)
  *
  * Add --json to also emit machine-readable events on stdout (used by the
  * deletion test); every invocation appends the same events to events.jsonl
@@ -126,6 +128,11 @@ async function main() {
     } else {
       log.emit("reconstituted", `RECONSTITUTED org from memory: ${report.rolesLoaded.length} roles, ${report.vendorsLoaded.length} vendors, ${report.obligationsResumed.length} obligation(s) resumed`, { resumed: report.obligationsResumed });
       print(mem, `RECONSTITUTED org from memory: ${report.rolesLoaded.length} roles, ${report.vendorsLoaded.length} vendors, ${report.obligationsResumed.length} obligation(s) resumed`);
+    }
+    // charter panel data for the desk (emitted every boot, read from memory)
+    const mission = await new OrgMemory(mem).getMission();
+    if (mission) {
+      log.emit("charter", `charter: ${mission.name}`, mission);
     }
     for (const v of report.vendorsLoaded) {
       log.emit("vendor", `vendor ${v.name}: quality=${v.quality?.toFixed?.(1) ?? v.quality ?? "?"} rate=$${v.rate.toFixed(2)} jobs=${v.jobs} failures=${v.failures}${v.banned ? " [BANNED]" : ""}`, v);

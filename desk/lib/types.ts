@@ -11,7 +11,10 @@ export interface OrgEvent {
     | "ruling"
     | "hire-port"
     | "wipe"
-    | "obligation";
+    | "obligation"
+    | "set-model"
+    | "refusal"
+    | "charter";
   text: string;
   data?: any;
 }

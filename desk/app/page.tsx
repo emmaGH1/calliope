@@ -67,8 +67,8 @@ export default function Desk() {
     tailRef.current?.scrollTo({ top: tailRef.current.scrollHeight });
   }, [events.length]);
 
-  const dispatch = async (cmd: string) => {
-    if (cmd === "wipe" && !confirm("Wipe the org from memory? Next boot will be a founding with nothing behind it.")) return;
+  const dispatch = async (cmd: string, crash = false) => {
+    if (cmd === "wipe" && !confirm("Wipe the org from memory? Entities are archived (Sibyl keeps journal residue) — next boot refounds from nothing.")) return;
     setBusy(true);
     try {
       const r = await fetch("/api/dispatch", {
@@ -76,6 +76,7 @@ export default function Desk() {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           cmd,
+          crash,
           mission,
           text: task,
           budget: Number(budget) || 3,
@@ -100,6 +101,10 @@ export default function Desk() {
     for (const e of events) if (e.kind === "vendor") m.set((e.data?.name ?? e.text).toString(), e);
     return [...m.values()].slice(-6);
   }, [events]);
+  const charterEvent = useMemo(
+    () => [...events].reverse().find((e) => e.kind === "charter"),
+    [events]
+  );
   const decisions = useMemo(
     () => [...events].reverse().filter((e) => e.kind === "decision").slice(0, 8),
     [events]
@@ -188,7 +193,7 @@ export default function Desk() {
               >
                 {mode === "amnesic" ? "run amnesic (no memory) ▸" : "dispatch task ▸"}
               </button>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <label className="flex cursor-pointer items-center gap-2 text-xs uppercase tracking-wider text-smoke">
                   <input
                     type="checkbox"
@@ -198,11 +203,18 @@ export default function Desk() {
                   />
                   deletion-test mode
                 </label>
+                <button
+                  onClick={() => dispatch("task", true)}
+                  disabled={busy}
+                  className="rounded-full border border-ash px-3 py-1 text-[10px] uppercase tracking-wider text-smoke hover:border-off-black hover:text-off-black disabled:opacity-40"
+                >
+                  crash mid-task
+                </button>
               </div>
             </div>
             <div className="mt-5 flex gap-3 border-t border-ash pt-5">
               <Pill tone="bad" onClick={() => dispatch("wipe")} disabled={busy}>
-                wipe org from memory
+                wipe org from memory (archives)
               </Pill>
             </div>
           </div>
@@ -256,7 +268,22 @@ export default function Desk() {
         {/* right: what i remember */}
         <section className="col-span-4 flex flex-col gap-6">
           <div className="rounded-[40px] border border-ash bg-periwinkle-mist p-10">
-            <p className="mb-6 text-xs uppercase tracking-widest text-smoke">04 · what I remember</p>
+            <p className="mb-4 text-xs uppercase tracking-widest text-smoke">04 · what I remember</p>
+            {charterEvent?.data && (
+              <div className="mb-6 border-b border-ash pb-5">
+                <p className="font-serif-ed text-xl leading-snug">{charterEvent.data.name}</p>
+                <p className="mt-1 text-xs leading-relaxed text-graphite">{charterEvent.data.mission}</p>
+                {(charterEvent.data.clientStandards ?? []).length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {(charterEvent.data.clientStandards as string[]).map((s) => (
+                      <span key={s} className="rounded-full border border-ash px-2.5 py-1 text-[10px] uppercase tracking-wider text-graphite">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             {vendors.length === 0 && <p className="text-sm text-smoke">vendor book empty — found the org first.</p>}
             <ul className="flex flex-col gap-4">
               {vendors.map((v, i) => {
