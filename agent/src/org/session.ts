@@ -23,6 +23,7 @@ import "dotenv/config";
 import { homedir } from "node:os";
 import { existsSync, rmSync } from "node:fs";
 import { join } from "node:path";
+import { CALLIOPE_ENV } from "../config/env.js";
 import { SibylMemory } from "../memory/sibyl.js";
 import { boot, AmnesicMemory } from "../org/boot.js";
 import { OrgMemory } from "../org/memory-schema.js";
@@ -106,7 +107,7 @@ async function main() {
         return;
       }
       const db =
-        process.env.SIBYL_DB ?? join(homedir(), ".sibyl-memory", "memory.db");
+        CALLIOPE_ENV.db() ?? join(homedir(), ".sibyl-memory", "memory.db");
       await close();
       if (existsSync(db)) {
         rmSync(db, { force: true });

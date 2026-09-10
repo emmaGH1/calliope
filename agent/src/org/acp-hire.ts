@@ -3,6 +3,7 @@ import { base } from "@account-kit/infra";
 import { SimHirePort } from "./hire.js";
 import type { HirePort } from "./hire.js";
 import type { VendorRecord } from "./types.js";
+import { CALLIOPE_ENV, env } from "../config/env.js";
 
 /**
  * ACP hire port: real Agent Commerce Protocol jobs (escrow + payment on
@@ -20,11 +21,11 @@ export class AcpHirePort implements HirePort {
   readonly label = "ACP(escrow on Base)";
 
   async hire(vendor: VendorRecord, req: { task: string; standards: string[] }) {
-    const walletAddress = process.env.CALLIOPE_WALLET_ADDRESS;
-    const walletId = process.env.CALLIOPE_WALLET_ID;
-    const signerPrivateKey = process.env.CALLIOPE_SIGNER_KEY;
-    const providerAddress = vendor.walletAddress ?? process.env.VENDOR_WALLET_ADDRESS;
-    const offeringName = vendor.offeringName ?? process.env.VENDOR_OFFERING_NAME;
+    const walletAddress = CALLIOPE_ENV.walletAddress();
+    const walletId = CALLIOPE_ENV.walletId();
+    const signerPrivateKey = CALLIOPE_ENV.signerKey();
+    const providerAddress = vendor.walletAddress ?? env("VENDOR_WALLET_ADDRESS");
+    const offeringName = vendor.offeringName ?? env("VENDOR_OFFERING_NAME");
     if (!walletAddress || !walletId || !signerPrivateKey || !providerAddress || !offeringName) {
       throw new Error("AcpHirePort: registration env missing (see code comment). Falling back is the caller's job.");
     }
@@ -35,8 +36,8 @@ export class AcpHirePort implements HirePort {
         walletId,
         signerPrivateKey,
         chains: [base],
-        ...(process.env.CALLIOPE_BUILDER_CODE
-          ? { builderCode: process.env.CALLIOPE_BUILDER_CODE }
+        ...(CALLIOPE_ENV.builderCode()
+          ? { builderCode: CALLIOPE_ENV.builderCode() }
           : {}),
       }),
     });
@@ -114,10 +115,11 @@ export class AcpHirePort implements HirePort {
 /** Env-gated factory: real ACP only when registration is configured. */
 export function hirePortForEnv(): { port: HirePort; real: boolean } {
   const ready = !!(
-    process.env.CALLIOPE_WALLET_ADDRESS &&
-    process.env.CALLIOPE_WALLET_ID &&
-    process.env.CALLIOPE_SIGNER_KEY &&
-    process.env.VENDOR_WALLET_ADDRESS
+    CALLIOPE_ENV.walletAddress() &&
+    CALLIOPE_ENV.walletId() &&
+    CALLIOPE_ENV.signerKey() &&
+    env("VENDOR_WALLET_ADDRESS") &&
+    env("VENDOR_OFFERING_NAME")
   );
   return ready ? { port: new AcpHirePort(), real: true } : { port: new SimHirePort(), real: false };
 }

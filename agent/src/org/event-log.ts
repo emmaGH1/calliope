@@ -1,5 +1,6 @@
 import { appendFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { CALLIOPE_ENV } from "../config/env.js";
 
 /**
  * Structured run events, appended as JSONL so the desk UI and tests can
@@ -31,7 +32,7 @@ export class EventLog {
   private pid = process.pid;
 
   constructor(path?: string) {
-    this.path = resolve(path ?? process.env.CALLIOPE_EVENT_LOG ?? "events.jsonl");
+    this.path = resolve(path ?? CALLIOPE_ENV.eventLog() ?? "events.jsonl");
   }
 
   emit(kind: OrgEvent["kind"], text: string, data?: unknown): OrgEvent {
