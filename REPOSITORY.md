@@ -19,5 +19,5 @@ part of the data model and external integration contract.
 ## Submission intent
 
 This repository is the public artifact for the Sibyl Labs Hackathon. It contains
-the verified local prototype, the desk UI, the deletion test, the honest ACP/LLM
+the verified local prototype, the six-page product site and console, the deletion test, the honest ACP/LLM
 integration seams, and the evidence documentation needed for judging.

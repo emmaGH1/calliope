@@ -82,14 +82,14 @@
   Editor specialist's style memory instead)
 - Provisional assumptions and confidence: ACP v2 SDK workable for solo demo
   (medium, resolves spike A); Sibyl MCP reachable from TS (medium-high,
-  Python sidecar fallback); desk UI demo-only on localhost (high)
+  Python sidecar fallback); site + console demo-only on localhost (high)
 
 ## Evidence
 | Criterion | Claim | Actual evidence | Judge access path | Status / limitation |
 | --- | --- | --- | --- | --- |
 | Memory load-bearing (40) | Removing Sibyl dissolves the org (no roles/routes/standards/vendor book reconstitute; tasks refused, bans forgotten) | VERIFIED via session.ts + npm test: amnesic control cannot route; real memory reconstitutes charter/roles/vendors/obligations and resumes crashed work (commits a841973+). Filmed side-by-side pending | repo test + demo video segment | Sim vendor outputs; ACP port pending |
 | Innovation (25) | Memory as the institution, not the notebook; absorbs grudge/continuity mechanics as subsystems | README memory note + architecture diagram | README | Unknown until built |
-| Execution (20) | Real escrow/payment txs on Base | tx hashes + explorer links in job log | desk UI + repo | Unknown until spike A |
+| Execution (20) | Real escrow/payment txs on Base | tx hashes + explorer links in job log | site/console + repo | Unknown until spike A |
 | Pitch (15) | Fresh-session recall unmistakable | 2–5 min video, unedited restart segment with clock | demo video on build page | Unknown until recorded |
 | PMF (+10) | Multi-agent spend/quality management pain | Framing + honest positioning only; no fabricated traction | README | Do not fabricate |
 | Multiplier ×1.25 | Virtuals ACP jobs + Base settlement both real | named stacks on build page + tx evidence | build page | Unknown until spike A |
@@ -104,8 +104,9 @@
     roles load-bearing (task refuses without role/* entities); model config
     lives in role entities (`set-model`); journal-citing QA; crash/resume;
     recall() NOT_FOUND normalization; `reset --yes` for pristine takes
-  - Desk UI: charter panel + crash button + honest wipe wording; running on
-    http://localhost:3737 (rebuild after a841973)
+  - Site: six routes (landing, product, memory, evidence, console, about)
+    on DESIGN.md tokens; console carries found/dispatch/crash/amnesic/wipe with
+    provenance panels; running on http://localhost:3737
   - commits: implementation history + Calliope rename/docs checkpoints; see `git log --oneline` and `REPOSITORY.md`
 - Next concrete action (user): push public repo, record demo per script
   (crash beat included), post 2x, fill build page + mark ready before
@@ -114,7 +115,7 @@
   registration + wallet funding are user-side; sim port keeps everything else honest
 - Blocker / fallback: LLM key (STUB fallback labeled); ACP pending; fallback = sim port
 - Deferred ideas / accepted scope tradeoffs: real-LLM take; real-ACP take;
-  third-party vendor hires; desk deploys (local control surface by design)
+  third-party vendor hires; public console deploy (local control surface by design)
 
 ## Submission
 - Form, video/slides, README, access status: not started; build-page link held by user

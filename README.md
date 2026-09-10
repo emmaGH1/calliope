@@ -86,7 +86,7 @@ verifies:
 The controlled crash is a deterministic checkpoint test, not a claim that every
 possible operating-system termination mode has been tested.
 
-## Run the local desk
+## Run the local site and console
 
 Install Sibyl Memory first:
 
@@ -95,7 +95,7 @@ uv tool install 'sibyl-memory-cli[mcp]'
 # or: pip install 'sibyl-memory-cli[mcp]'
 ```
 
-Then start the local desk:
+Then start the local site:
 
 ```bash
 cd desk
@@ -105,9 +105,20 @@ npm run dev
 
 Open [http://localhost:3737](http://localhost:3737).
 
-The desk is intentionally a **local control surface**, not a deployed production
-service. It starts a fresh Calliope process for each dispatch and displays the
-resulting event projection. It has controls for:
+The site has six routes:
+
+| Route | Purpose |
+|---|---|
+| `/` | Landing: thesis, the fresh-session moment, evidence strip |
+| `/product` | How the org works: lifecycle, memory domains, crash/resume |
+| `/memory` | Sibyl Memory deep-dive: read/write map, deletion test |
+| `/evidence` | Status matrix, reproduction commands, falsification |
+| `/console` | Live control surface (each action starts a fresh OS process) |
+| `/about` | Principles, origin, FAQ, roadmap |
+
+The console is intentionally a **local control surface**, not a deployed
+production service. It starts a fresh Calliope process for each dispatch and
+displays the resulting event projection. It has controls for:
 
 - founding the organization from a paragraph;
 - dispatching a task;
@@ -177,11 +188,16 @@ The integration lives in `agent/src/memory/sibyl.ts`. Typed domain access is in
 
 ## UI design
 
-The desk follows `DESIGN.md`: warm parchment, editorial serif hierarchy,
-monospace functional labels, hairline borders, large rounded cards, and Lake
-Blue for the primary dispatch action.
+The site follows the design contract in `DESIGN.md` (kept in-repo): warm
+parchment canvas, editorial serif hierarchy, monospace functional labels,
+hairline borders, 40px cards, pill controls, Lake Blue reserved for the single
+primary action per view, and restrained eased motion that respects
+`prefers-reduced-motion`. An optional one-off analysis of a local inspiration
+clip confirmed the same direction: near-zero-saturation light editorial
+surfaces with one sustained ambient motion element (the lifecycle diagram's
+flow lines).
 
-The three evidence surfaces are:
+The console's three evidence surfaces are:
 
 1. **Found / dispatch** — mission paragraph, task brief, budget, crash and
    amnesic controls.
@@ -232,7 +248,7 @@ development provenance.
 
 ```text
 agent/             TypeScript agent loop and Sibyl MCP client
-desk/              local Next.js control surface
+desk/              local Next.js site (6 routes) + live console
 docs/              demo script, posts, submission checklist
 DESIGN.md          UI design reference
 HACKATHON.md       event state and evidence

@@ -7,8 +7,9 @@ on-screen timestamp**. Every simulation is labeled on screen. No fabricated data
 ## Setup before recording
 
 1. Terminal 1: `cd agent && npm run org -- reset --yes` (pristine local store for the take — deletes memory.db; a CLI wipe would archive entities and leave journal residue that shows up in QA context chips).
-2. Start the desk: `cd desk && npm run dev` → http://localhost:3737
-3. Recording window covers: the desk in a browser + nothing else needed.
+2. Start the site: `cd desk && npm run dev` → http://localhost:3737
+   (optional 15s pre-roll: hold on the landing hero, then move to /console)
+3. Recording window covers: the site in a browser + nothing else needed. The console lives at /console.
    OS clock visible in the taskbar or `date` echoed into a scratch terminal —
    the recall segment must carry an on-screen timestamp.
 4. Micro-check: `cd agent && npm test` (24 checks) — output available to show if asked.
@@ -28,7 +29,7 @@ on-screen timestamp**. Every simulation is labeled on screen. No fabricated data
 
 ## Honest labeling (rules)
 
-- When the vendor deliverables are STUB outputs, the desk log already says
+- When the vendor deliverables are STUB outputs, the console log already says
   `hire port: SIM(no real escrow)` — do not obscure it; say "simulated vendors in this
   take; the ACP escrow path activates with registered agents."
 - The recall segment (2:20–3:10) must not be cut or sped up; leave the clock visible.
