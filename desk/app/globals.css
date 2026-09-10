@@ -18,12 +18,12 @@
   --color-smoke: #797776;
   --color-ash: #cecac8;
 
-  /* ---- Fonts ---- (system stacks: no webfont downloads, hermetic builds) */
-  --font-abc-diatype-mono: "JetBrains Mono", "IBM Plex Mono", "Space Mono",
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-untitled-serif: Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-untitled-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, sans-serif;
+  /* ---- Fonts ---- next/font sets --font-serif-face / --font-mono-face on <html> */
+  --font-abc-diatype-mono: var(--font-mono-face), "IBM Plex Mono", ui-monospace,
+    monospace;
+  --font-untitled-serif: var(--font-serif-face), "Instrument Serif", Georgia,
+    serif;
+  --font-untitled-sans: var(--font-mono-face), system-ui, sans-serif;
 
   /* ---- Type scale ---- */
   --text-caption: 12px;
@@ -79,6 +79,15 @@
 body {
   background-color: var(--color-parchment);
   color: var(--color-off-black);
+}
+
+/* Force next/font faces through Tailwind utilities (Turbopack @theme
+   can otherwise leave headings on the body mono stack). */
+.font-untitled-serif {
+  font-family: var(--font-serif-face), "Instrument Serif", Georgia, serif !important;
+}
+.font-abc-diatype-mono {
+  font-family: var(--font-mono-face), "IBM Plex Mono", ui-monospace, monospace !important;
 }
 
 /* Full-bleed bands use calc(50% - 50vw) margins; clip keeps the scrollbar
@@ -191,12 +200,23 @@ p {
 /* Ambient flow on the pipeline diagram (single sustained-motion element) */
 @keyframes flow {
   to {
-    stroke-dashoffset: -160;
+    stroke-dashoffset: -180;
   }
 }
 .flow-line {
-  stroke-dasharray: 3 9;
-  animation: flow 12s linear infinite;
+  stroke-dasharray: 4 10;
+  animation: flow 10s linear infinite;
+}
+
+/* Soft paper grain — fixed overlay, DESIGN.md editorial texture */
+body::before {
+  content: "";
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 @media (prefers-reduced-motion: reduce) {

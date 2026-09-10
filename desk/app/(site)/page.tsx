@@ -9,7 +9,7 @@ const FACTS = [
   { value: "24/24", label: "deletion-test checks", state: "verified" as const },
   { value: "5", label: "fresh processes in the test story", state: "verified" as const },
   { value: "5", label: "memory domains, each load-bearing", state: "verified" as const },
-  { value: "ACP", label: "escrow path wired, not run", state: "not-run" as const },
+  { value: "Base", label: "settlement receipt on Sepolia", state: "verified" as const },
 ];
 
 const STEPS = [
@@ -37,25 +37,25 @@ export default function LandingPage() {
   return (
     <>
       {/* Hero — centered hold, product story in the first screen */}
-      <section className="relative overflow-hidden pb-20 pt-16 sm:pt-20">
+      <section className="relative overflow-hidden pb-24 pt-20 sm:pb-28 sm:pt-28">
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-6 -z-10 h-[380px] w-[720px] -translate-x-1/2 rounded-full bg-gradient-to-r from-coral/50 via-sky-blue/50 to-mint/50 blur-[70px]"
+          className="pointer-events-none absolute left-1/2 top-10 -z-10 h-[420px] w-[min(920px,100%)] -translate-x-1/2 rounded-full bg-gradient-to-r from-coral/45 via-sky-blue/50 to-mint/45 blur-[80px]"
         />
         <div className="mx-auto max-w-4xl text-center">
           <Reveal>
             <Kicker>An organization that survives its workers</Kicker>
-            <h1 className="mt-6 font-untitled-serif text-heading font-normal sm:text-display">
+            <h1 className="mt-8 font-untitled-serif text-heading font-normal tracking-[-0.02em] sm:text-display">
               Your agents are employees.
               <br />
-              Calliope is the company.
+              <span className="italic text-graphite">Calliope is the company.</span>
             </h1>
-            <p className="mx-auto mt-7 max-w-2xl text-body-lg text-graphite">
+            <p className="mx-auto mt-8 max-w-2xl text-body-lg leading-relaxed text-graphite">
               The charter, the standards, the vendor history, and the work in
               flight live in Sibyl Memory. Kill every process — the next one
               reads the organization back and finishes the job.
             </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <PillLink href="/console" tone="blue">
                 Open the console
               </PillLink>
@@ -66,13 +66,15 @@ export default function LandingPage() {
                 See the evidence →
               </Link>
             </div>
-            <p className="mt-6 text-body-sm text-graphite">
-              <span className="font-medium text-off-black">24/24 deletion checks</span> ·
-              kill the process, the org reassembles · runs locally · MIT licensed
+            <p className="mt-7 text-body-sm text-graphite">
+              <span className="font-medium text-off-black">24/24 deletion checks</span>
+              {" · "}Base settlement live · runs locally · MIT
             </p>
           </Reveal>
           <Reveal delay={120}>
-            <HeroTranscript />
+            <div className="mt-14">
+              <HeroTranscript />
+            </div>
           </Reveal>
         </div>
       </section>
