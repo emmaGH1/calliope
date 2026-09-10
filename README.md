@@ -2,6 +2,8 @@
 
 > **Your agents are employees. Calliope is the company.**
 
+![Calliope — live site preview](./docs/assets/calliope-preview.png)
+
 Calliope is a restart-safe organization of AI workers whose durable operating
 state lives in [Sibyl Memory](https://docs.sibyllabs.org). The charter, roles,
 standards, vendor history, and unfinished obligations survive process death.
@@ -17,7 +19,7 @@ project is a wrapper. Calliope is designed around the opposite test:
 > Base Sepolia settlement receipts are verified. Virtuals ACP is wired but not
 > claimed. Simulated vendor output is explicitly labeled in the desk and logs.
 
-> **Live site:** https://calliope-emmagh1s-projects.vercel.app — the five-page
+> **Live site:** https://calliopehq.vercel.app/ — the five-page
 > overview is public; the interactive console runs locally (it spawns real
 > agent processes against Sibyl Memory, so it lives where your org lives).
 

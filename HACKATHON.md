@@ -102,7 +102,7 @@
 - Current objective / owner: Sibyl + Base submission (Virtuals aborted;
   Base CalliopeSettlement live on Sepolia → ×1.15)
 - Working state / verified commands and links:
-  - Public repo: https://github.com/emmaGH1/calliope (MIT)
+  - Public repo: https://github.com/emmaGH1/calliope (MIT) · live site: https://calliopehq.vercel.app/
   - `cd agent && npm test` — 24/24 (2026-09-10)
   - Site + console ready on localhost:3737; DemoRail includes Recall
   - Posts drafts in docs/POSTS.md tag @sibylcap; no Base/Virtuals claims

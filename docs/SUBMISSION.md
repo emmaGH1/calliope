@@ -18,7 +18,7 @@ Sepolia (×1.15). Do not claim Virtuals. Show a Basescan tx in the demo.
 
 ## Build-page steps (user has the private link)
 
-1. Add repo URL: https://github.com/emmaGH1/calliope
+1. Add repo URL: https://github.com/emmaGH1/calliope · live site: https://calliopehq.vercel.app/
 2. Add demo video + both post links.
 3. Stacks: **Sibyl Memory + Base** (not Virtuals). Copy the README memory note + settlement links.
 4. **Mark ready** — before Sep 10 23:59 UTC.

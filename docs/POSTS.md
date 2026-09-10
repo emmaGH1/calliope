@@ -36,6 +36,7 @@ After QA, Calliope also stamps the ruling on Base
 (CalliopeSettlement on Sepolia) so the receipt is independently checkable.
 
 Code: https://github.com/emmaGH1/calliope
+Site: https://calliopehq.vercel.app/
 Settlement: https://sepolia.basescan.org/address/0xEc8749f2e33E4B4cdBee1B79A2CF9b12E2183819
 
 #SibylHackathon #ForgettingIsABug #Base
@@ -65,6 +66,7 @@ Rulings also settle on Base (live Sepolia txs in the demo).
 
 Demo: (paste video link)
 Repo: https://github.com/emmaGH1/calliope
+Site: https://calliopehq.vercel.app/
 Base receipt: https://sepolia.basescan.org/address/0xEc8749f2e33E4B4cdBee1B79A2CF9b12E2183819
 
 @sibylcap #SibylHackathon #ForgettingIsABug #Base
