@@ -46,15 +46,15 @@
   lanes: payment dedup (Coral, HaggleMind), authorization/rules (Pact,
   OnRecord, GoBRA), scar memory (Vesper), meta data-layer (Dejavu). Almost all
   = one agent + a list; memory as inhibitor/consequence.
-- PIVOT DECISION (2026-09-07): original "Calliope" concept sat directly in the
-  GRUDGE/Continuum spotlight lane → pivoted to the open lane: memory as the
-  institution itself. Skeleton (orchestrator, vendor agents, memory, desk)
-  unchanged; framing and one memory domain added.
+- PIVOT DECISION (2026-09-07): original vendor-grudge concept sat directly in
+  the GRUDGE/Continuum spotlight lane → pivoted to the open lane: memory as the
+  institution itself. Product renamed from Charter to Calliope on 2026-09-09;
+  implementation skeleton (orchestrator, vendor agents, memory, desk) preserved.
 - Chosen user / task / current workaround: operator of a small multi-agent
   workforce; workaround = state lives in prompts/context windows, so restarts,
   crashes, and model swaps lose the "company" and the user re-explains
   everything
-- Concept: CHARTER — "Your agents are employees; Calliope is the company."
+- Concept: CALLIOPE — "Your agents are employees; Calliope is the company."
   A workforce of specialist agents whose entire institution lives in Sibyl
   Memory: org charter, roles, handoff routes, client standards, vendor book,
   in-flight obligations. Nothing org-level is hardcoded. Kill every process →
@@ -75,7 +75,7 @@
 - Riskiest assumption / experiment / observed result / fallback:
   ACP end-to-end job usable in our timeframe (spike A, day 1). Fallback: own
   vendor agents + x402 USDC payments on Base (keeps Base ×1.15, drops Virtuals)
-- Alternatives considered / rejection reasons: Calliope/Casebook (crowded
+- Alternatives considered / rejection reasons: vendor-grudge Casebook (crowded
   spotlight lane / prior-work risk), Creditmind (two-sided, heavy),
   The Witness (no coordination pattern), XP Market (hard to demo), taste-
   convergence agent (single-agent, weak coordination fit — folded in as the
@@ -95,7 +95,7 @@
 | Multiplier ×1.25 | Virtuals ACP jobs + Base settlement both real | named stacks on build page + tx evidence | build page | Unknown until spike A |
 
 ## Current execution
-- Current objective / owner: submission hardening done; user-gated: repo push, video, posts, build page
+- Current objective / owner: Calliope public-repository preparation; user-gated: video, posts, build page
 - Working state / verified commands and links:
   - `cd agent && npm test` — deletion test, 24/24 VERIFIED (real processes;
     sections: founding/ban, reconstitution/citation/pass, amnesic collapse
@@ -106,7 +106,7 @@
     recall() NOT_FOUND normalization; `reset --yes` for pristine takes
   - Desk UI: charter panel + crash button + honest wipe wording; running on
     http://localhost:3737 (rebuild after a841973)
-  - commits: 7f5a74a 778abb2 592b3e8 48937b0 7b79da1 cb41757 dad1b41 a841973 (+ docs)
+  - commits: implementation history + Calliope rename/docs checkpoints; see `git log --oneline` and `REPOSITORY.md`
 - Next concrete action (user): push public repo, record demo per script
   (crash beat included), post 2x, fill build page + mark ready before
   Sep 10 23:59 UTC (internal 20:00 cutoff)
