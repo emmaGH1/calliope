@@ -33,7 +33,7 @@ export function SiteNav() {
                 href={l.href}
                 aria-current={active ? "page" : undefined}
                 className={`text-label uppercase tracking-[0.06em] transition-colors ${
-                  active ? "text-off-black" : "text-graphite hover:text-off-black"
+                  active ? "font-medium text-off-black" : "text-graphite hover:text-off-black"
                 }`}
               >
                 {l.label}
