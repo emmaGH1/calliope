@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { OrgEvent } from "../lib/types";
+import type { OrgEvent } from "../../lib/types";
 
 /** Monad-styled site office for the org that lives in Sibyl Memory. */
 
