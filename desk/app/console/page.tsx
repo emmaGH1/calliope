@@ -3,11 +3,27 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OrgEvent } from "../../lib/types";
+import { DemoRail } from "../../components/demo-rail";
 
 /** Local control surface: every action starts a fresh OS process. */
 
 const fmt = (ts: string) =>
   new Date(ts).toLocaleTimeString("en-GB", { hour12: false });
+
+/** Log toning: decisions read brightest; system chatter recedes. */
+const KIND_TONE: Record<string, string> = {
+  decision: "text-parchment font-medium",
+  wipe: "text-parchment font-medium",
+  refusal: "text-parchment font-medium",
+  deliverable: "text-ash",
+  obligation: "text-ash",
+  founded: "text-smoke",
+  reconstituted: "text-smoke",
+  charter: "text-smoke",
+  vendor: "text-smoke",
+  "hire-port": "text-smoke",
+  "set-model": "text-smoke",
+};
 
 const eventKey = (e: OrgEvent) => `${e.ts}|${e.pid}|${e.kind}|${e.text}`;
 
@@ -36,7 +52,7 @@ function Panel({
 }) {
   return (
     <section className="rounded-3xl border border-ash p-8 sm:p-10">
-      <h2 className="text-caption uppercase tracking-[0.18em] text-graphite">
+      <h2 className="text-caption font-medium uppercase tracking-[0.18em] text-graphite">
         {step} · {title}
       </h2>
       <div className="mt-6">{children}</div>
@@ -157,7 +173,7 @@ export default function ConsolePage() {
   );
 
   return (
-    <div className="mx-auto max-w-[var(--page-max-width)] px-6 pb-16 sm:px-10">
+    <main id="main" className="mx-auto max-w-[var(--page-max-width)] px-6 pb-16 sm:px-10">
       {/* Console chrome */}
       <header className="flex flex-col gap-6 border-b border-ash py-8 lg:flex-row lg:items-end lg:justify-between">
         <div>
@@ -197,9 +213,20 @@ export default function ConsolePage() {
         </div>
       )}
 
-      <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-12">
-        {/* Controls */}
-        <div className="flex flex-col gap-6 lg:col-span-4">
+      <DemoRail
+        events={sorted}
+        busy={busy}
+        onRun={(step) => {
+          if (step === "found") void dispatch("found");
+          else if (step === "crash") void dispatch("task", { crash: true });
+          else if (step === "amnesic") void dispatch("amnesic-task");
+          else void dispatch("task");
+        }}
+      />
+
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* Controls — sticky so the primary actions stay in view */}
+        <div className="flex flex-col gap-6 lg:sticky lg:top-6 lg:col-span-4 lg:self-start">
           <Panel step="01" title="Found">
             <label htmlFor="mission" className="block text-body-sm text-graphite">
               Founding mission — written into memory by one process, read back forever
@@ -360,23 +387,42 @@ export default function ConsolePage() {
             {decisions.length === 0 ? (
               <p className="text-body text-graphite">Nothing decided yet.</p>
             ) : (
-              <ul className="flex flex-col gap-5">
-                {decisions.map((d, i) => (
-                  <li key={`${d.ts}-${i}`}>
-                    <p className="text-body">
-                      <span className="text-graphite">{fmt(d.ts)}</span> — {d.text}
-                    </p>
-                    <p className="mt-1 text-body-sm text-graphite">
-                      because: {d.data?.because ?? ""}
-                      {d.data?.source && (
-                        <span className="ml-3 inline-block rounded-full border border-ash px-3 py-1 text-caption uppercase tracking-[0.1em]">
-                          {d.data.source}
-                        </span>
-                      )}
-                    </p>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <div className="rounded-2xl bg-periwinkle-mist p-6">
+                  <p className="text-caption font-medium uppercase tracking-[0.18em] text-graphite">
+                    Latest decision
+                  </p>
+                  <p className="mt-3 font-untitled-serif text-subheading font-normal">
+                    {decisions[0].text}
+                  </p>
+                  <p className="mt-2 text-body-sm text-graphite">
+                    because: {decisions[0].data?.because ?? ""}
+                    {decisions[0].data?.source && (
+                      <span className="ml-3 inline-block rounded-full border border-ash px-3 py-1 text-caption uppercase tracking-[0.1em]">
+                        {decisions[0].data.source}
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <ul className="mt-6 flex flex-col gap-5">
+                  {decisions.slice(1).map((d, i) => (
+                    <li key={`${d.ts}-${i}`}>
+                      <p className="text-body">
+                        <span className="text-graphite">{fmt(d.ts)}</span> —{" "}
+                        <span className="font-medium">{d.text}</span>
+                      </p>
+                      <p className="mt-1 text-body-sm text-graphite">
+                        because: {d.data?.because ?? ""}
+                        {d.data?.source && (
+                          <span className="ml-3 inline-block rounded-full border border-ash px-3 py-1 text-caption uppercase tracking-[0.1em]">
+                            {d.data.source}
+                          </span>
+                        )}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </Panel>
         </div>
@@ -428,11 +474,12 @@ export default function ConsolePage() {
               {sorted.map((e, i) => (
                 <p
                   key={`${eventKey(e)}-${i}`}
-                  className="border-b border-graphite py-2 text-caption leading-relaxed text-ash"
+                  className={`border-b border-graphite py-2 text-caption leading-relaxed ${
+                    KIND_TONE[e.kind] ?? "text-ash"
+                  }`}
                 >
                   <span className="text-smoke">{fmt(e.ts)}</span> pid{e.pid}{" "}
-                  <span className="uppercase tracking-[0.1em] text-smoke">{e.kind}</span> —{" "}
-                  {e.text}
+                  <span className="uppercase tracking-[0.1em] text-smoke">{e.kind}</span> — {e.text}
                 </p>
               ))}
             </div>
@@ -449,6 +496,6 @@ export default function ConsolePage() {
         </p>
         <p>Local-only surface — not a public deployment.</p>
       </footer>
-    </div>
+    </main>
   );
 }
