@@ -1,60 +1,71 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { OrgEvent } from "../../lib/types";
 
-/** Monad-styled site office for the org that lives in Sibyl Memory. */
+/** Local control surface: every action starts a fresh OS process. */
 
-const fmt = (ts: string) => {
-  const d = new Date(ts);
-  return d.toLocaleTimeString("en-GB", { hour12: false });
-};
+const fmt = (ts: string) =>
+  new Date(ts).toLocaleTimeString("en-GB", { hour12: false });
 
-function Pill({
+const eventKey = (e: OrgEvent) => `${e.ts}|${e.pid}|${e.kind}|${e.text}`;
+
+function mergeEvents(prev: OrgEvent[], incoming: OrgEvent[]): OrgEvent[] {
+  const seen = new Set(prev.map(eventKey));
+  const next = [...prev];
+  for (const e of incoming) {
+    const k = eventKey(e);
+    if (!seen.has(k)) {
+      seen.add(k);
+      next.push(e);
+    }
+  }
+  next.sort((a, b) => a.ts.localeCompare(b.ts) || a.pid - b.pid);
+  return next;
+}
+
+function Panel({
+  step,
+  title,
   children,
-  tone = "ghost",
-  onClick,
-  disabled,
 }: {
+  step: string;
+  title: string;
   children: React.ReactNode;
-  tone?: "blue" | "black" | "ghost" | "bad";
-  onClick?: () => void;
-  disabled?: boolean;
 }) {
-  const tones: Record<string, string> = {
-    blue: "bg-lake-blue text-white",
-    black: "bg-off-black text-white",
-    ghost: "border border-off-black text-off-black hover:bg-off-black hover:text-parchment",
-    bad: "border border-ash text-smoke hover:text-off-black hover:border-off-black",
-  };
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`rounded-full px-4 py-2 text-xs uppercase tracking-wide transition-colors disabled:opacity-40 ${tones[tone]}`}
-    >
-      {children}
-    </button>
+    <section className="rounded-3xl border border-ash p-8 sm:p-10">
+      <h2 className="text-caption uppercase tracking-[0.18em] text-graphite">
+        {step} · {title}
+      </h2>
+      <div className="mt-6">{children}</div>
+    </section>
   );
 }
 
-export default function Desk() {
+export default function ConsolePage() {
   const [events, setEvents] = useState<OrgEvent[]>([]);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [mission, setMission] = useState(
     "Localize client landing copy with brand voice intact, on budget, every time."
   );
-  const [task, setTask] = useState("Localize the landing page hero to Japanese. Keep the brand voice.");
+  const [task, setTask] = useState(
+    "Localize the landing page hero to Japanese. Keep the brand voice."
+  );
   const [budget, setBudget] = useState("3");
-  const [mode, setMode] = useState<"live" | "amnesic">("live");
-  const tailRef = useRef<HTMLDivElement>(null);
+  const [amnesic, setAmnesic] = useState(false);
+  const logRef = useRef<HTMLDivElement>(null);
 
   const refresh = useCallback(async () => {
     try {
       const r = await fetch("/api/state");
       const j = await r.json();
-      if (j.ok) setEvents(j.events);
-    } catch {}
+      if (j.ok) setEvents((prev) => mergeEvents(prev, j.events as OrgEvent[]));
+    } catch {
+      /* transient; next poll retries */
+    }
   }, []);
 
   useEffect(() => {
@@ -64,275 +75,380 @@ export default function Desk() {
   }, [refresh]);
 
   useEffect(() => {
-    tailRef.current?.scrollTo({ top: tailRef.current.scrollHeight });
+    const el = logRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [events.length]);
 
-  const dispatch = async (cmd: string, crash = false) => {
-    if (cmd === "wipe" && !confirm("Wipe the org from memory? Entities are archived (Sibyl keeps journal residue) — next boot refounds from nothing.")) return;
+  const dispatch = async (cmd: string, opts: { crash?: boolean } = {}) => {
+    if (
+      cmd === "wipe" &&
+      !confirm(
+        "Wipe the org from memory? Entities are archived (Sibyl keeps journal residue) — the next boot founds from nothing."
+      )
+    ) {
+      return;
+    }
     setBusy(true);
+    setError(null);
     try {
       const r = await fetch("/api/dispatch", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           cmd,
-          crash,
+          crash: Boolean(opts.crash),
           mission,
           text: task,
           budget: Number(budget) || 3,
         }),
       });
       const j = await r.json();
-      setEvents((prev) => [...prev, ...j.events]);
-    } catch {
-      alert("dispatch failed — check that the agent env is running (see README)");
+      if (Array.isArray(j.events)) {
+        setEvents((prev) => mergeEvents(prev, j.events as OrgEvent[]));
+      }
+      if (!j.ok) {
+        setError(
+          `The worker process reported a problem (status ${j.status ?? "?"}). ${
+            j.error ?? j.stderr ?? "See the run log."
+          }`.trim()
+        );
+      }
+    } catch (e) {
+      setError(`Dispatch failed: ${(e as Error).message}`);
     }
     setBusy(false);
   };
 
-  const last = useMemo(() => events[events.length - 1], [events]);
+  const sorted = events;
+  const last = sorted[sorted.length - 1];
   const bootEvent = useMemo(
-    () =>
-      [...events].reverse().find((e) => e.kind === "founded" || e.kind === "reconstituted"),
-    [events]
+    () => [...sorted].reverse().find((e) => e.kind === "founded" || e.kind === "reconstituted"),
+    [sorted]
+  );
+  const charterEvent = useMemo(
+    () => [...sorted].reverse().find((e) => e.kind === "charter"),
+    [sorted]
   );
   const vendors = useMemo(() => {
     const m = new Map<string, OrgEvent>();
-    for (const e of events) if (e.kind === "vendor") m.set((e.data?.name ?? e.text).toString(), e);
+    for (const e of sorted) {
+      if (e.kind !== "vendor") continue;
+      const name = (e.data?.name ?? e.text).toString();
+      m.delete(name); // re-insert so iteration order is most-recent-last
+      m.set(name, e);
+    }
     return [...m.values()].slice(-6);
-  }, [events]);
-  const charterEvent = useMemo(
-    () => [...events].reverse().find((e) => e.kind === "charter"),
-    [events]
-  );
+  }, [sorted]);
   const decisions = useMemo(
-    () => [...events].reverse().filter((e) => e.kind === "decision").slice(0, 8),
-    [events]
+    () => [...sorted].reverse().filter((e) => e.kind === "decision").slice(0, 8),
+    [sorted]
   );
   const obligations = useMemo(
-    () => [...events].reverse().filter((e) => e.kind === "obligation").slice(0, 6),
-    [events]
+    () => [...sorted].reverse().filter((e) => e.kind === "obligation").slice(0, 6),
+    [sorted]
   );
   const lastDeliverable = useMemo(
-    () => [...events].reverse().find((e) => e.kind === "deliverable"),
-    [events]
+    () => [...sorted].reverse().find((e) => e.kind === "deliverable"),
+    [sorted]
   );
-  const lastSessionPid = last?.pid;
+  const hirePort = useMemo(
+    () => [...sorted].reverse().find((e) => e.kind === "hire-port"),
+    [sorted]
+  );
 
   return (
-    <main className="mx-auto max-w-[1432px] px-10">
-      {/* header */}
-      <header className="flex items-center justify-between border-b border-ash py-6">
-        <div className="flex items-baseline gap-6">
-          <h1 className="font-serif-ed text-[28px] font-normal tracking-[-0.02em]">Calliope</h1>
-          <p className="text-xs uppercase tracking-widest text-smoke">
-            the org that lives in memory · sibyl labs 2026
+    <div className="mx-auto max-w-[var(--page-max-width)] px-6 pb-16 sm:px-10">
+      {/* Console chrome */}
+      <header className="flex flex-col gap-6 border-b border-ash py-8 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <Link href="/" className="text-body-sm uppercase tracking-[0.1em] text-graphite hover:text-off-black">
+            ← Calliope
+          </Link>
+          <h1 className="mt-3 font-untitled-serif text-heading-sm font-normal">Console</h1>
+          <p className="mt-2 max-w-2xl text-body text-graphite">
+            Local control surface. Every action starts a fresh OS process against
+            your Sibyl Memory store — this page is not a public deployment.
           </p>
         </div>
-        <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-smoke">
-          {busy && <span className="animate-pulse text-lake-blue">session running…</span>}
-          <span className="rounded-full border border-ash px-3 py-1">
-            last pid {lastSessionPid ?? "—"}
+        <div className="flex flex-wrap items-center gap-3 text-caption uppercase tracking-[0.12em] text-graphite">
+          <span className="rounded-full border border-ash px-4 py-2">
+            last pid {last?.pid ?? "—"}
           </span>
           {bootEvent && (
-            <span className={`rounded-full border px-3 py-1 ${bootEvent.kind === "founded" ? "border-ash text-smoke" : "border-off-black text-off-black"}`}>
-              {bootEvent.kind === "founded" ? "org founded" : "org reconstituted from memory"} · {fmt(bootEvent.ts)}
+            <span className="rounded-full border border-ash px-4 py-2">
+              {bootEvent.kind === "founded" ? "org founded" : "org reconstituted"} · {fmt(bootEvent.ts)}
             </span>
           )}
+          {hirePort && (
+            <span className="rounded-full border border-ash px-4 py-2">{hirePort.text}</span>
+          )}
+          <span aria-live="polite" className="text-off-black">
+            {busy ? "session running…" : ""}
+          </span>
         </div>
       </header>
 
-      {/* three-zone body */}
-      <div className="grid grid-cols-12 gap-6 py-10">
-        {/* left: task intake */}
-        <section className="col-span-3 flex flex-col gap-6">
-          <div className="rounded-[40px] border border-ash p-10">
-            <p className="mb-6 text-xs uppercase tracking-widest text-smoke">01 · found / dispatch</p>
-            <label className="mb-2 block text-xs uppercase tracking-wider text-graphite">founding mission</label>
+      {error && (
+        <div
+          role="alert"
+          className="mt-6 rounded-3xl border border-off-black bg-periwinkle-mist px-8 py-5 text-body"
+        >
+          {error}
+        </div>
+      )}
+
+      <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* Controls */}
+        <div className="flex flex-col gap-6 lg:col-span-4">
+          <Panel step="01" title="Found">
+            <label htmlFor="mission" className="block text-body-sm text-graphite">
+              Founding mission — written into memory by one process, read back forever
+            </label>
             <textarea
+              id="mission"
               value={mission}
               onChange={(e) => setMission(e.target.value)}
               rows={4}
-              className="w-full resize-none border border-ash bg-transparent p-4 text-sm leading-relaxed outline-none focus:border-off-black"
+              className="mt-3 w-full resize-none rounded-2xl border border-ash bg-transparent p-4 text-body outline-none focus:border-off-black"
             />
-            <div className="mt-4 flex flex-col gap-3">
-              <button
-                onClick={() => dispatch("found")}
-                disabled={busy}
-                className="rounded-full bg-off-black px-6 py-2 text-xs uppercase tracking-wide text-white disabled:opacity-40"
-              >
-                found the org from this paragraph
-              </button>
-              <p className="text-xs text-smoke">
-                one process writes the charter, roles, and vendor book into memory. it exists after this process dies.
-              </p>
-            </div>
-          </div>
+            <button
+              type="button"
+              onClick={() => dispatch("found")}
+              disabled={busy}
+              className="mt-4 w-full rounded-full bg-off-black px-6 py-4 text-body-sm uppercase tracking-[0.08em] text-parchment transition-colors hover:bg-graphite disabled:opacity-40"
+            >
+              Found the org from this paragraph
+            </button>
+          </Panel>
 
-          <div className="rounded-[40px] border border-ash p-10">
-            <label className="mb-2 block text-xs uppercase tracking-wider text-graphite">task brief</label>
+          <Panel step="02" title="Dispatch">
+            <label htmlFor="task" className="block text-body-sm text-graphite">
+              Task brief
+            </label>
             <textarea
+              id="task"
               value={task}
               onChange={(e) => setTask(e.target.value)}
               rows={3}
-              className="w-full resize-none border border-ash bg-transparent p-4 text-sm outline-none focus:border-off-black"
+              className="mt-3 w-full resize-none rounded-2xl border border-ash bg-transparent p-4 text-body outline-none focus:border-off-black"
             />
-            <div className="mt-3 flex items-center gap-3">
-              <span className="text-xs uppercase tracking-wider text-graphite">budget usdc</span>
+            <div className="mt-4 flex items-center gap-4">
+              <label htmlFor="budget" className="text-body-sm text-graphite">
+                Budget (USDC)
+              </label>
               <input
+                id="budget"
+                inputMode="decimal"
                 value={budget}
                 onChange={(e) => setBudget(e.target.value.replace(/[^\d.]/g, ""))}
-                className="w-20 border border-ash bg-transparent px-3 py-1.5 text-sm outline-none focus:border-off-black"
+                className="w-24 rounded-2xl border border-ash bg-transparent px-4 py-2 text-body outline-none focus:border-off-black"
               />
             </div>
-            <div className="mt-4 flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={() => dispatch(amnesic ? "amnesic-task" : "task")}
+              disabled={busy}
+              className="mt-5 w-full rounded-full bg-lake-blue px-6 py-4 text-body-sm uppercase tracking-[0.08em] text-parchment transition-colors hover:bg-off-black disabled:opacity-40"
+            >
+              {amnesic ? "Run amnesic (no memory) ▸" : "Dispatch task ▸"}
+            </button>
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              <label className="flex cursor-pointer items-center gap-3 text-body-sm text-graphite">
+                <input
+                  type="checkbox"
+                  checked={amnesic}
+                  onChange={(e) => setAmnesic(e.target.checked)}
+                  className="h-4 w-4 accent-off-black"
+                />
+                Deletion-test mode
+              </label>
               <button
-                onClick={() => dispatch(mode === "amnesic" ? "amnesic-task" : "task")}
-                disabled={busy}
-                className="rounded-full bg-lake-blue px-6 py-2 text-xs uppercase tracking-wide text-white disabled:opacity-40"
+                type="button"
+                onClick={() => dispatch("task", { crash: true })}
+                disabled={busy || amnesic}
+                title={amnesic ? "Crash simulation applies to live tasks only" : undefined}
+                className="rounded-full border border-ash px-5 py-2 text-caption uppercase tracking-[0.12em] text-graphite transition-colors hover:border-off-black hover:text-off-black disabled:opacity-40"
               >
-                {mode === "amnesic" ? "run amnesic (no memory) ▸" : "dispatch task ▸"}
+                Crash mid-task
               </button>
-              <div className="flex items-center gap-3">
-                <label className="flex cursor-pointer items-center gap-2 text-xs uppercase tracking-wider text-smoke">
-                  <input
-                    type="checkbox"
-                    checked={mode === "amnesic"}
-                    onChange={(e) => setMode(e.target.checked ? "amnesic" : "live")}
-                    className="accent-off-black"
-                  />
-                  deletion-test mode
-                </label>
-                <button
-                  onClick={() => dispatch("task", true)}
-                  disabled={busy}
-                  className="rounded-full border border-ash px-3 py-1 text-[10px] uppercase tracking-wider text-smoke hover:border-off-black hover:text-off-black disabled:opacity-40"
-                >
-                  crash mid-task
-                </button>
-              </div>
             </div>
-            <div className="mt-5 flex gap-3 border-t border-ash pt-5">
-              <Pill tone="bad" onClick={() => dispatch("wipe")} disabled={busy}>
-                wipe org from memory (archives)
-              </Pill>
-            </div>
-          </div>
-        </section>
+          </Panel>
 
-        {/* center: job wall + provenance */}
-        <section className="col-span-5 flex flex-col gap-6">
-          <div className="rounded-[40px] border border-ash p-10">
-            <p className="mb-6 text-xs uppercase tracking-widest text-smoke">02 · decision record</p>
-            {decisions.length === 0 && (
-              <p className="text-sm text-smoke">nothing decided yet — found the org or dispatch a task.</p>
-            )}
-            <ul className="flex flex-col gap-5">
-              {decisions.map((d, i) => (
-                <li key={d.ts + i} className="flex flex-col gap-1.5">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-xs text-smoke">{fmt(d.ts)}</span>
-                    <span className="text-sm">{d.text}</span>
-                  </div>
-                  <p className="pl-16 text-xs leading-relaxed text-smoke">
-                    because: {d.data?.because ?? ""}
-                    <span className="ml-2 rounded-full border border-ash px-2 py-0.5 text-[10px] uppercase tracking-wider">
-                      {d.data?.source ?? ""}
-                    </span>
+          <Panel step="03" title="Destructive">
+            <p className="text-body-sm text-graphite">
+              Wiping archives the org&apos;s entities; the append-only journal keeps
+              its residue, which QA can still cite. For a pristine store, use{" "}
+              <code>npm run org -- reset --yes</code> in the agent.
+            </p>
+            <button
+              type="button"
+              onClick={() => dispatch("wipe")}
+              disabled={busy}
+              className="mt-4 w-full rounded-full border border-graphite px-6 py-3 text-body-sm uppercase tracking-[0.08em] text-graphite transition-colors hover:border-off-black hover:text-off-black disabled:opacity-40"
+            >
+              Wipe org from memory (archives)
+            </button>
+          </Panel>
+        </div>
+
+        {/* Memory + decisions */}
+        <div className="flex flex-col gap-6 lg:col-span-8">
+          <Panel step="04" title="What I remember">
+            <div className="grid grid-cols-1 gap-8 xl:grid-cols-2">
+              <div>
+                {charterEvent?.data ? (
+                  <>
+                    <h3 className="font-untitled-serif text-subheading font-normal">
+                      {charterEvent.data.name}
+                    </h3>
+                    <p className="mt-2 text-body text-graphite">{charterEvent.data.mission}</p>
+                    {(charterEvent.data.clientStandards ?? []).length > 0 && (
+                      <ul className="mt-4 flex flex-wrap gap-2">
+                        {(charterEvent.data.clientStandards as string[]).map((s) => (
+                          <li
+                            key={s}
+                            className="rounded-full border border-ash px-3 py-1 text-caption uppercase tracking-[0.1em] text-graphite"
+                          >
+                            {s}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-body text-graphite">
+                    No charter in memory yet — found the org first.
                   </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-[40px] border border-ash p-10">
-            <p className="mb-6 text-xs uppercase tracking-widest text-smoke">03 · obligations</p>
-            {obligations.length === 0 && <p className="text-sm text-smoke">no obligations on the wall.</p>}
-            <ul className="flex flex-col gap-3">
-              {obligations.map((o, i) => (
-                <li key={o.ts + i} className="flex items-center justify-between border-b border-ash pb-3 text-sm last:border-b-0">
-                  <span className="truncate pr-4">{o.text}</span>
-                  <span className="shrink-0 text-xs uppercase tracking-wider text-smoke">pid {o.pid}</span>
-                </li>
-              ))}
-            </ul>
-            {lastDeliverable && (
-              <div className="mt-6 border-t border-ash pt-5">
-                <p className="mb-2 text-xs uppercase tracking-widest text-smoke">latest deliverable</p>
-                <p className="font-serif-ed text-lg leading-snug">{lastDeliverable.text.replace(/^deliverable: /, "")}</p>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* right: what i remember */}
-        <section className="col-span-4 flex flex-col gap-6">
-          <div className="rounded-[40px] border border-ash bg-periwinkle-mist p-10">
-            <p className="mb-4 text-xs uppercase tracking-widest text-smoke">04 · what I remember</p>
-            {charterEvent?.data && (
-              <div className="mb-6 border-b border-ash pb-5">
-                <p className="font-serif-ed text-xl leading-snug">{charterEvent.data.name}</p>
-                <p className="mt-1 text-xs leading-relaxed text-graphite">{charterEvent.data.mission}</p>
-                {(charterEvent.data.clientStandards ?? []).length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {(charterEvent.data.clientStandards as string[]).map((s) => (
-                      <span key={s} className="rounded-full border border-ash px-2.5 py-1 text-[10px] uppercase tracking-wider text-graphite">
-                        {s}
-                      </span>
-                    ))}
-                  </div>
                 )}
               </div>
-            )}
-            {vendors.length === 0 && <p className="text-sm text-smoke">vendor book empty — found the org first.</p>}
-            <ul className="flex flex-col gap-4">
-              {vendors.map((v, i) => {
-                const d = v.data ?? {};
-                return (
-                  <li key={v.ts + i} className="flex items-center justify-between text-sm">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{d.name}</span>
-                        {d.banned && (
-                          <span className="rounded-full bg-off-black px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">banned</span>
-                        )}
-                      </div>
-                      <p className="mt-0.5 text-xs text-graphite">
-                        {d.jobs ?? 0} job(s) · {d.failures ?? 0} failure(s)
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm">${(d.rate ?? 0).toFixed(2)}</p>
-                      <p className="text-xs text-graphite">quality {d.quality ?? "?"}/5</p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-            <p className="mt-6 border-t border-ash pt-4 text-xs leading-relaxed text-graphite">
-              this panel is read back from Sibyl Memory by every fresh process — it is why the next session hires
-              differently. delete the memory and this whole column empties.
-            </p>
-          </div>
+              <div>
+                <h3 className="text-caption uppercase tracking-[0.18em] text-graphite">Vendor book</h3>
+                {vendors.length === 0 ? (
+                  <p className="mt-4 text-body text-graphite">Empty until the org is founded.</p>
+                ) : (
+                  <ul className="mt-4 flex flex-col">
+                    {vendors.map((v, i) => {
+                      const d = v.data ?? {};
+                      return (
+                        <li
+                          key={`${v.ts}-${i}`}
+                          className="flex items-center justify-between gap-4 border-b border-ash py-3 text-body last:border-b-0"
+                        >
+                          <span className="flex items-center gap-3">
+                            {d.name}
+                            {d.banned && (
+                              <span className="rounded-full bg-off-black px-3 py-1 text-caption uppercase tracking-[0.1em] text-parchment">
+                                banned
+                              </span>
+                            )}
+                          </span>
+                          <span className="text-body-sm text-graphite">
+                            {d.jobs ?? 0} job(s) · {d.failures ?? 0} fail · q{" "}
+                            {typeof d.quality === "number" ? d.quality.toFixed(1) : "?"} · $
+                            {(d.rate ?? 0).toFixed(2)}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </Panel>
 
-          <div className="rounded-[40px] border border-ash p-10">
-            <p className="mb-4 text-xs uppercase tracking-widest text-smoke">05 · run log</p>
-            <div ref={tailRef} className="max-h-64 overflow-y-auto pr-2 font-mono-ui">
-              {[...events].reverse().slice(0, 40).map((e, i) => (
-                <p key={e.ts + i} className="border-b border-ash py-1.5 text-xs leading-relaxed text-graphite">
+          <Panel step="05" title="Decision record">
+            {decisions.length === 0 ? (
+              <p className="text-body text-graphite">Nothing decided yet.</p>
+            ) : (
+              <ul className="flex flex-col gap-5">
+                {decisions.map((d, i) => (
+                  <li key={`${d.ts}-${i}`}>
+                    <p className="text-body">
+                      <span className="text-graphite">{fmt(d.ts)}</span> — {d.text}
+                    </p>
+                    <p className="mt-1 text-body-sm text-graphite">
+                      because: {d.data?.because ?? ""}
+                      {d.data?.source && (
+                        <span className="ml-3 inline-block rounded-full border border-ash px-3 py-1 text-caption uppercase tracking-[0.1em]">
+                          {d.data.source}
+                        </span>
+                      )}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Panel>
+        </div>
+      </div>
+
+      {/* Obligations + log */}
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <div className="lg:col-span-5">
+          <Panel step="06" title="Obligations">
+            {obligations.length === 0 ? (
+              <p className="text-body text-graphite">No obligations on the wall.</p>
+            ) : (
+              <ul className="flex flex-col">
+                {obligations.map((o, i) => (
+                  <li
+                    key={`${o.ts}-${i}`}
+                    className="flex items-center justify-between gap-4 border-b border-ash py-3 text-body last:border-b-0"
+                  >
+                    <span className="truncate">{o.text}</span>
+                    <span className="shrink-0 text-caption uppercase tracking-[0.1em] text-graphite">
+                      pid {o.pid}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {lastDeliverable && (
+              <div className="mt-6 border-t border-ash pt-5">
+                <h3 className="text-caption uppercase tracking-[0.18em] text-graphite">
+                  Latest deliverable
+                </h3>
+                <p className="mt-2 font-untitled-serif text-body-lg">
+                  {lastDeliverable.text.replace(/^deliverable: /, "")}
+                </p>
+              </div>
+            )}
+          </Panel>
+        </div>
+        <div className="lg:col-span-7">
+          <section className="flex h-full flex-col rounded-3xl bg-off-black p-8 sm:p-10">
+            <h2 className="text-caption uppercase tracking-[0.18em] text-ash">07 · Run log</h2>
+            <div
+              ref={logRef}
+              tabIndex={0}
+              role="log"
+              aria-label="Run log"
+              className="mt-6 max-h-80 flex-1 overflow-y-auto pr-2"
+            >
+              {sorted.map((e, i) => (
+                <p
+                  key={`${eventKey(e)}-${i}`}
+                  className="border-b border-graphite py-2 text-caption leading-relaxed text-ash"
+                >
                   <span className="text-smoke">{fmt(e.ts)}</span> pid{e.pid}{" "}
-                  <span className="uppercase tracking-wider text-smoke">{e.kind}</span> — {e.text}
+                  <span className="uppercase tracking-[0.1em] text-smoke">{e.kind}</span> —{" "}
+                  {e.text}
                 </p>
               ))}
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
 
-      <footer className="border-t border-ash py-6 text-xs uppercase tracking-widest text-smoke">
-        every dispatch is a fresh OS process · decisions carry memory provenance · wipe the org and nothing
-        reassembles
+      <footer className="mt-12 flex flex-col gap-2 border-t border-ash pt-6 text-body-sm text-graphite sm:flex-row sm:items-center sm:justify-between">
+        <p>
+          Built with Sibyl Memory. ·{" "}
+          <Link href="/" className="underline underline-offset-4 hover:text-off-black">
+            Back to the site
+          </Link>
+        </p>
+        <p>Local-only surface — not a public deployment.</p>
       </footer>
-    </main>
+    </div>
   );
 }
