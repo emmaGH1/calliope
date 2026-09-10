@@ -34,13 +34,14 @@ const STATUS = [
   },
   {
     thing: "Base settlement receipt (CalliopeSettlement)",
-    state: "not-run" as const,
-    evidence: "Env-gated settle on Base Sepolia after QA; claim only with a live explorer tx in the demo",
+    state: "verified" as const,
+    evidence:
+      "Live Base Sepolia Settled txs after QA — contract 0xEc8749f2…3819; example https://sepolia.basescan.org/tx/0x28bc3dd8cd39a06636d391994bde0a779092dfcf5960731b0c43aabb4fdbc40e",
   },
   {
     thing: "Virtuals ACP jobs",
     state: "not-run" as const,
-    evidence: "Typed adapter exists; not used in the Sibyl-only / Base-only submission path",
+    evidence: "Typed adapter exists; not claimed in this submission",
   },
 ];
 

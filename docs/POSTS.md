@@ -2,8 +2,8 @@
 
 Rules (hack.sibyllabs.org/rules, accessed 2026-09-10): two public posts, one
 build-log and one with the demo video, tagging **@sibylcap** and each *claimed*
-partner. Calliope does **not** claim Base or Virtuals — those paths are wired
-and labeled NOT RUN. Do not hashtag them as stacks.
+partner. Calliope claims **Base** (live CalliopeSettlement txs on Base Sepolia).
+Do **not** claim Virtuals/ACP.
 
 Post from the project X account. Simulated vendors stay labeled.
 
@@ -32,9 +32,13 @@ What that buys you:
 The deletion test is an actual test: `npm test` spawns real processes and
 asserts the collapse. 24/24.
 
-Code: https://github.com/emmaGH1/calliope
+After QA, Calliope also stamps the ruling on Base
+(CalliopeSettlement on Sepolia) so the receipt is independently checkable.
 
-#SibylHackathon #ForgettingIsABug
+Code: https://github.com/emmaGH1/calliope
+Settlement: https://sepolia.basescan.org/address/0xEc8749f2e33E4B4cdBee1B79A2CF9b12E2183819
+
+#SibylHackathon #ForgettingIsABug #Base
 
 ---
 
@@ -57,8 +61,10 @@ Then every memory call is stubbed: no roles, no vendor book, no ban. The task
 is refused. That's `npm test`, on camera.
 
 Calliope — your agents are employees. The company lives in Sibyl Memory.
+Rulings also settle on Base (live Sepolia txs in the demo).
 
 Demo: (paste video link)
 Repo: https://github.com/emmaGH1/calliope
+Base receipt: https://sepolia.basescan.org/address/0xEc8749f2e33E4B4cdBee1B79A2CF9b12E2183819
 
-@sibylcap #SibylHackathon #ForgettingIsABug
+@sibylcap #SibylHackathon #ForgettingIsABug #Base

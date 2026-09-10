@@ -3,25 +3,25 @@
 Mark-ready deadline: **Sep 10, 2026, 23:59 UTC** (internal cutoff 20:00 UTC).
 Judging Sep 11–12. Winners announced Sep 13–15.
 
-**ACP/Virtuals aborted.** Partner stacks are optional. Sibyl-only (×1.00) is
-eligible and honest. Do not claim Base or Virtuals on the build page.
+**Virtuals ACP aborted.** **Base is live** via `CalliopeSettlement` on Base
+Sepolia (×1.15). Do not claim Virtuals. Show a Basescan tx in the demo.
 
 ## Required deliverables (per /submissions)
 
 | # | Deliverable | State | Remaining (user-side) |
 | --- | --- | --- | --- |
 | 1 | Public repo, OSI license, real commit history | READY — https://github.com/emmaGH1/calliope (public, MIT) | — |
-| 2 | Demo video 2–5 min with fresh-session recall moment | SCRIPT READY — `docs/DEMO_SCRIPT.md` | record now (OBS/Game Bar); clock visible; sims labeled |
-| 3 | Team & partner stacks named | READY in README: Sibyl required; Virtuals/Base NOT RUN — do not claim | — |
-| 4 | Memory implementation note | READY in README (domains + read/write map + "How memory made this possible") | paste into build page |
-| + | Build-in-public posts | DRAFTS READY — `docs/POSTS.md` | post 2× tagging **@sibylcap** (not @SibylLabs); no Base/Virtuals claim |
+| 2 | Demo video 2–5 min with fresh-session recall moment | SCRIPT READY — `docs/DEMO_SCRIPT.md` | record now; clock visible; sims labeled; point at Base settle tx |
+| 3 | Team & partner stacks named | Sibyl required + **Base verified**; Virtuals NOT claimed | claim Base + Sibyl on build page |
+| 4 | Memory implementation note | READY in README | paste into build page |
+| + | Build-in-public posts | DRAFTS READY — `docs/POSTS.md` | post 2× tagging **@sibylcap** and Base |
 
 ## Build-page steps (user has the private link)
 
 1. Add repo URL: https://github.com/emmaGH1/calliope
 2. Add demo video + both post links.
-3. Stacks: Sibyl Memory only. Copy the README memory note.
-4. **Mark ready** — before Sep 10 23:59 UTC. Keep the internal 20:00 UTC cutoff.
+3. Stacks: **Sibyl Memory + Base** (not Virtuals). Copy the README memory note + settlement links.
+4. **Mark ready** — before Sep 10 23:59 UTC.
 
 ## Evidence references for the build page / README
 

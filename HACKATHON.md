@@ -96,11 +96,11 @@
 | Execution (20) | Clean second-run: deletion test + honest SIM labels; no unused-stack claims | `cd agent && npm test` (24 checks); README integration table | repo + /evidence | ACP/Base NOT RUN; do not claim |
 | Pitch (15) | Fresh-session recall unmistakable | 2–5 min video, unedited restart segment with clock | demo video on build page | Unknown until recorded |
 | PMF (+10) | Multi-agent spend/quality management pain | Framing + honest positioning only; no fabricated traction | README | Default 0; do not fabricate |
-| Multiplier | Do not claim Base or Virtuals | README discloses wired-but-NOT-RUN | build page stacks field | ×1.00 accepted |
+| Multiplier ×1.15 | Base settlement live on Sepolia; Virtuals not claimed | Contract `0xEc8749f2…3819`; txs `0x28bc3dd8…` (FAIL) and `0xd21f5676…` (PASS) on sepolia.basescan | demo log + README + build page | Base verified; Virtuals NOT RUN |
 
 ## Current execution
-- Current objective / owner: Sibyl-only submission (ACP/Virtuals aborted
-  2026-09-10 — not required; multiplier left at ×1.00)
+- Current objective / owner: Sibyl + Base submission (Virtuals aborted;
+  Base CalliopeSettlement live on Sepolia → ×1.15)
 - Working state / verified commands and links:
   - Public repo: https://github.com/emmaGH1/calliope (MIT)
   - `cd agent && npm test` — 24/24 (2026-09-10)

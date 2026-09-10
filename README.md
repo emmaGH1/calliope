@@ -13,10 +13,9 @@ simple: if removing memory does not break the product's claimed behavior, the
 project is a wrapper. Calliope is designed around the opposite test:
 **remove Sibyl and there is no company to resume.**
 
-> Status: working local prototype. Sibyl persistence and the deletion test are
-> verified. Real LLM and Virtuals ACP/Base settlement paths are wired but not
-> live-verified without user credentials. Simulated vendor output is explicitly
-> labeled in the desk and logs.
+> Status: working local prototype. Sibyl persistence, the deletion test, and
+> Base Sepolia settlement receipts are verified. Virtuals ACP is wired but not
+> claimed. Simulated vendor output is explicitly labeled in the desk and logs.
 
 ## The problem
 
@@ -222,8 +221,8 @@ The console's three evidence surfaces are:
 |---|---|
 | Sibyl Memory | **Verified** through stdio MCP and fresh-process tests |
 | OpenAI / xAI | Wired through role model configuration; deterministic STUB fallback; not run without a key |
-| Virtuals ACP | Typed `AcpHirePort` exists; optional; not claimed unless a live ACP hire is demoed |
-| Base settlement | `CalliopeSettlement` posts a Settled event after QA when `CALLIOPE_SETTLEMENT_ADDRESS` is set; claim only with a live explorer tx |
+| Virtuals ACP | Typed `AcpHirePort` exists; **not claimed** in this submission |
+| Base settlement | **Verified** on Base Sepolia — [`CalliopeSettlement`](https://sepolia.basescan.org/address/0xEc8749f2e33E4B4cdBee1B79A2CF9b12E2183819) posts a `Settled` event after each QA ruling. Example tx: [`0x28bc3dd8…`](https://sepolia.basescan.org/tx/0x28bc3dd8cd39a06636d391994bde0a779092dfcf5960731b0c43aabb4fdbc40e) |
 | Vendor work | Deterministic simulation by default, labeled `SIM(no real escrow)` |
 
 ## Environment and limitations
