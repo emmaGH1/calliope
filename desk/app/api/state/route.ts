@@ -1,28 +1,17 @@
-import { readFileSync, statSync } from "node:fs";
+import { statSync } from "node:fs";
 import { resolve } from "node:path";
-import type { OrgEvent } from "../../../lib/types";
+import { eventLogPath, readEventLog } from "../../../lib/server-events";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const AGENT = resolve(process.env.CALLIOPE_AGENT_DIR ?? process.env.CHARTER_AGENT_DIR ?? "../agent");
-  const path = resolve(AGENT, "events.jsonl");
+  const events = readEventLog(AGENT, 400);
+  let mtime = 0;
   try {
-    const raw = readFileSync(path, "utf8");
-    const events: OrgEvent[] = raw
-      .split("\n")
-      .filter(Boolean)
-      .slice(-400)
-      .map((l) => {
-        try {
-          return JSON.parse(l);
-        } catch {
-          return null;
-        }
-      })
-      .filter(Boolean);
-    return Response.json({ ok: true, events, mtime: statSync(path).mtimeMs });
+    mtime = statSync(eventLogPath(AGENT)).mtimeMs;
   } catch {
-    return Response.json({ ok: true, events: [], mtime: 0 });
+    /* log does not exist yet */
   }
+  return Response.json({ ok: true, events, mtime });
 }
