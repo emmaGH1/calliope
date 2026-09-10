@@ -3,6 +3,7 @@ import { OrgMemory } from "./memory-schema.js";
 import type { HirePort } from "./hire.js";
 import { pickVendor } from "./hire.js";
 import { modelFor } from "./model.js";
+import { settleOnBase, baseSettleReady } from "./base-settle.js";
 
 /**
  * The org's unit of work, split so interruption is REAL:
@@ -215,7 +216,48 @@ export async function completeObligation(
     await org.event("ruling", { id, pass: false, vendor: vendorName });
   }
 
-  return { obligationId: id, deliverable, vendor: vendorName, spend, decisions };
+  // 5. Optional Base settlement — real onchain receipt when env is configured.
+  let baseTx: string | undefined;
+  let baseExplorer: string | undefined;
+  if (baseSettleReady()) {
+    const settled = await settleOnBase({
+      obligationId: id,
+      pass: verdict.pass,
+      spendUsd: spend,
+    });
+    if (settled.ok) {
+      baseTx = settled.txHash;
+      baseExplorer = settled.explorerUrl;
+      decisions.push({
+        choice: `Base settle ${verdict.pass ? "PASS" : "FAIL"} → ${settled.txHash.slice(0, 10)}…`,
+        because: `${settled.label}; obligation receipt posted onchain`,
+        source: "CalliopeSettlement on Base",
+      });
+      await org.event("base-settle", {
+        id,
+        pass: verdict.pass,
+        tx: settled.txHash,
+        explorer: settled.explorerUrl,
+        chainId: settled.chainId,
+      });
+    } else {
+      decisions.push({
+        choice: `Base settle skipped — ${settled.reason}`,
+        because: settled.label,
+        source: "CalliopeSettlement on Base",
+      });
+    }
+  }
+
+  return {
+    obligationId: id,
+    deliverable,
+    vendor: vendorName,
+    spend,
+    decisions,
+    baseTx,
+    baseExplorer,
+  };
 }
 
 /** Legacy single-shot entry (used by tests/spikes): open + complete. */

@@ -222,8 +222,8 @@ The console's three evidence surfaces are:
 |---|---|
 | Sibyl Memory | **Verified** through stdio MCP and fresh-process tests |
 | OpenAI / xAI | Wired through role model configuration; deterministic STUB fallback; not run without a key |
-| Virtuals ACP | Typed `AcpHirePort` exists; not live-verified without registered agents and signer credentials |
-| Base | Intended ACP escrow/settlement layer; no transaction claim without a real receipt |
+| Virtuals ACP | Typed `AcpHirePort` exists; optional; not claimed unless a live ACP hire is demoed |
+| Base settlement | `CalliopeSettlement` posts a Settled event after QA when `CALLIOPE_SETTLEMENT_ADDRESS` is set; claim only with a live explorer tx |
 | Vendor work | Deterministic simulation by default, labeled `SIM(no real escrow)` |
 
 ## Environment and limitations

@@ -149,6 +149,12 @@ async function main() {
       const { port: hire, real } = hirePortForEnv();
       log.emit("hire-port", `hire port: ${hire.label}${real ? "" : " (real ACP activates with CALLIOPE_* env)"}`, { label: hire.label, real });
       print(mem, `hire port: ${hire.label}`);
+      const { baseSettleLabel, baseSettleReady } = await import("./base-settle.js");
+      log.emit("hire-port", `base settle: ${baseSettleLabel()}`, {
+        label: baseSettleLabel(),
+        ready: baseSettleReady(),
+      });
+      print(mem, `base settle: ${baseSettleLabel()}`);
 
       // crash beat: write the obligation, then die before completing it
       if (flags.includes("--crash")) {
@@ -191,6 +197,14 @@ async function main() {
       }
       log.emit("deliverable", result.deliverable, { deliverable: result.deliverable });
       print(mem, `deliverable: ${result.deliverable}`);
+      if (result.baseTx) {
+        log.emit(
+          "base-settle",
+          `Base settle tx ${result.baseTx}${result.baseExplorer ? ` · ${result.baseExplorer}` : ""}`,
+          { tx: result.baseTx, explorer: result.baseExplorer }
+        );
+        print(mem, `Base settle: ${result.baseExplorer ?? result.baseTx}`);
+      }
     }
   } finally {
     await close();

@@ -33,9 +33,14 @@ const STATUS = [
     evidence: "Wired through role model config; runs on a labeled deterministic stub without a key",
   },
   {
-    thing: "Virtuals ACP jobs and Base settlement",
+    thing: "Base settlement receipt (CalliopeSettlement)",
     state: "not-run" as const,
-    evidence: "Typed adapter exists; requires registered agents and funded wallets — no transaction claim",
+    evidence: "Env-gated settle on Base Sepolia after QA; claim only with a live explorer tx in the demo",
+  },
+  {
+    thing: "Virtuals ACP jobs",
+    state: "not-run" as const,
+    evidence: "Typed adapter exists; not used in the Sibyl-only / Base-only submission path",
   },
 ];
 

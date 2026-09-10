@@ -48,6 +48,9 @@ export interface TaskResult {
   deliverable: string;
   vendor: string;
   spend: number;
+  /** Set when a Base settlement tx was attempted (ok or honest failure). */
+  baseTx?: string;
+  baseExplorer?: string;
   decisions: Decision[];
 }
 

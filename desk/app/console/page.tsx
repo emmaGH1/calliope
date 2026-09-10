@@ -22,6 +22,7 @@ const KIND_TONE: Record<string, string> = {
   charter: "text-smoke",
   vendor: "text-smoke",
   "hire-port": "text-smoke",
+  "base-settle": "text-parchment font-medium",
   "set-model": "text-smoke",
 };
 

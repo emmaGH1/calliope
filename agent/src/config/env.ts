@@ -11,4 +11,9 @@ export const CALLIOPE_ENV = {
   eventLog: () => env("CALLIOPE_EVENT_LOG", "CHARTER_EVENT_LOG"),
   agentDir: () => env("CALLIOPE_AGENT_DIR", "CHARTER_AGENT_DIR"),
   db: () => env("CALLIOPE_DB", "SIBYL_DB"),
+  /** Base settlement (partner stack ×1.15) — independent of Virtuals ACP. */
+  basePrivateKey: () => env("CALLIOPE_BASE_PRIVATE_KEY"),
+  settlementAddress: () => env("CALLIOPE_SETTLEMENT_ADDRESS"),
+  baseChain: () => env("CALLIOPE_BASE_CHAIN"), // "base-sepolia" (default) | "base"
+  baseRpc: () => env("CALLIOPE_BASE_RPC"),
 };

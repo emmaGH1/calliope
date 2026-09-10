@@ -10,6 +10,7 @@ export interface OrgEvent {
     | "deliverable"
     | "ruling"
     | "hire-port"
+    | "base-settle"
     | "wipe"
     | "obligation"
     | "set-model"
