@@ -7,7 +7,7 @@ Judging Sep 11–12. Winners announced Sep 13–15.
 
 | # | Deliverable | State | Remaining (user-side) |
 | --- | --- | --- | --- |
-| 1 | Public repo, OSI license, real commit history | READY — `calliope/` MIT; 5+ commits Sep 7–9 | create/push public GitHub repo (e.g. `charter-org`), confirm link |
+| 1 | Public repo, OSI license, real commit history | READY — Calliope, MIT; milestone history in local repository | push/confirm the public GitHub repository: https://github.com/emmaGH1/calliope |
 | 2 | Demo video 2–5 min with fresh-session recall moment | SCRIPT READY — `docs/DEMO_SCRIPT.md` | record per script (OBS/Game Bar), ~20 min incl. retakes |
 | 3 | Team & partner stacks named | READY in README (Sibyl; Virtuals ACP env-gated — disclose NOT RUN; Base via ACP) | register agents → real ACP take if time permits (optional; ×1.25 depends on it) |
 | 4 | Memory implementation note | READY in README ("Memory implementation note" + read/write site table + deletion test) | — |
@@ -22,11 +22,12 @@ Judging Sep 11–12. Winners announced Sep 13–15.
 
 ## Evidence references for the build page / README
 
-- Deletion test: `cd agent && npm test` → 18/18 (screenshot or mention).
-- Memory read sites: `agent/src/org/run-task.ts:27` (charter→standards),
-  `:51` (vendor book→hire), `agent/src/org/boot.ts:114-116` (reconstitution).
-- Memory write sites: `run-task.ts:108,128-135` (learned quality + ban),
-  `run-task.ts:39` (obligations), `boot.ts:98-107` (founding).
+- Deletion test: `cd agent && npm test` → 24/24 (screenshot or mention).
+- Memory read sites: `agent/src/org/run-task.ts:36` (charter→standards),
+  `:82` (roles→routing), `:101` (vendor book→hire),
+  `agent/src/org/boot.ts:95-116` (founding/reconstitution).
+- Memory write sites: `run-task.ts:174-210` (outcomes, quality, bans),
+  `run-task.ts:48` (obligations), `session.ts:167-179` (resume).
 
 ## Time-boxed stretch (only after 1–4 are done)
 

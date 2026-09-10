@@ -25,7 +25,7 @@ What that buys you:
 • vendors get banned into the vendor book, and the NEXT session cites the ban
 
 The deletion test is an actual test: `npm test` spawns real processes and
-asserts the collapse. 18/18. Code: (repo link)
+asserts the collapse. 24/24. Code: https://github.com/emmaGH1/calliope
 
 #SibylHackathon #ForgettingIsABug #Virtuals #Base #AgentMemory
 
