@@ -1,82 +1,145 @@
-# 30-minute ACP attempt (Base mainnet, tiny USDC)
+# Click-by-click: set up Virtuals ACP for Calliope
 
-**Start:** note the clock. **Hard abort** if the hire-port chip is still
-`SIM(no real escrow)` after 30 minutes → Sibyl-only submission.
+## First: this is NOT Vercel
 
-## Why not Base Sepolia testnet?
+| Name | What it is | Do you need it tonight? |
+|---|---|---|
+| **Vercel** | Website hosting (vercel.com) | **No.** Calliope desk runs on localhost. |
+| **Virtuals** | Agent marketplace / ACP (app.virtuals.io) | **Yes** — only if you want the ×1.25 partner bonus. |
 
-Virtuals FAQ: external builders generally **cannot create testnet agents**
-without DevRel. They recommend **Base mainnet** with tiny prices ($0.01).
-Calliope already targets mainnet `base` — no code change needed for this path.
+You are registering **AI agents on Virtuals Protocol**, so Calliope can hire another agent and pay with USDC on Base.
 
-Hackathon Base credit needs an **executed onchain action** in the demo.
-Mainnet USDC escrow at $0.01–$1 counts. Sepolia would also count in principle,
-but registration is the blocker tonight.
+If this feels too heavy before 21:00 WAT: **skip it**. Sibyl-only (×1.00) is still a valid submission. Say “abort ACP”.
 
-## You do these steps (agent cannot create your Virtuals account)
+---
 
-### 1. Register buyer agent (~10 min)
+## What you are creating (2 agents)
 
-1. Open https://app.virtuals.io/acp/new (or Join ACP → Register New Agent).
-2. Role: **Requestor** (buyer / client).
-3. Name it something like `Calliope Desk`.
-4. Complete wallet connect + agent wallet provisioning (Base mainnet).
-5. From the agent page, copy into a notes file:
-   - Agent wallet address → `CALLIOPE_WALLET_ADDRESS`
-   - Wallet / Privy id → `CALLIOPE_WALLET_ID`
-   - Signer key (whitelisted) → `CALLIOPE_SIGNER_KEY`
-   - Builder code if shown → `CALLIOPE_BUILDER_CODE` (optional)
+Think of a shop:
 
-### 2. Register or pick a vendor offering (~10 min)
+1. **Buyer agent = Calliope Desk** — pays for work. Role: **Requestor**  
+2. **Seller agent = Atelier** — does the work. Role: **Provider** (with one cheap offering)
 
-You need a **provider** agent with a named offering Calliope can hire.
+Calliope’s code is the buyer. It needs the seller’s wallet + offering name to place a job.
 
-Options:
-- Register a second agent as provider with a cheap offering ($0.01–$1), **or**
-- Hire an existing public offering (copy its wallet + offering name).
+---
 
-Save:
-- `VENDOR_WALLET_ADDRESS`
-- `VENDOR_OFFERING_NAME`
+## Step 0 — Browser wallet (5 min)
 
-### 3. Fund buyer with USDC on Base mainnet (~5 min)
+1. Install **MetaMask** or **Rabby** if you do not have one.  
+2. Create/import a wallet. This is your **personal / “dev” wallet** (you sign with it).  
+3. You will need a little **USDC on Base mainnet** later (~$1–$5). Not Ethereum mainnet. Not Sepolia.
 
-Send a small amount of **USDC on Base (chain 8453)** to `CALLIOPE_WALLET_ADDRESS`.
-$1–$5 is enough for a demo hire. Wrong chain = lost funds.
+---
 
-### 4. Drop env into the repo (~2 min)
+## Step 1 — Open Virtuals ACP and connect
+
+1. Go to: **https://app.virtuals.io/acp/join**  
+2. Click **Connect Wallet** (top right).  
+3. Approve in MetaMask/Rabby.  
+4. Confirm your address shows in the UI.
+
+---
+
+## Step 2 — Create the BUYER agent (Calliope)
+
+1. Click **Join ACP** → read the blurb → **Next**.  
+2. Open **Register New Agent**.  
+3. Fill in:
+   - **Name:** `Calliope Desk`  
+   - **Role:** **`Requestor`** ← this is the important one (buyer; hires others)  
+   - Profile picture: any small JPG/PNG (required)  
+4. Finish X / Telegram auth if the form requires it (use any account you can; VPN if blocked).  
+5. On the agent page, create the agent smart wallet if prompted:
+   - Click **Create Smart Contract Account** (or similar).  
+6. **Whitelist your personal wallet** as the controller (Wallet Management / Whitelist).  
+7. Copy these into a notepad (map to Calliope `.env` later):
+
+| What you see on Virtuals | Put in `.env` as |
+|---|---|
+| Agent wallet address (the agent’s smart wallet, NOT your MetaMask address if they differ) | `CALLIOPE_WALLET_ADDRESS` |
+| Wallet / Privy id (if shown) | `CALLIOPE_WALLET_ID` |
+| Signer / whitelisted wallet private key (the key you use to sign — keep secret) | `CALLIOPE_SIGNER_KEY` |
+| Builder code (optional) | `CALLIOPE_BUILDER_CODE` |
+
+If the portal shows **Entity ID** instead of Wallet ID, paste what you see in chat and I will map it.
+
+---
+
+## Step 3 — Create the SELLER agent (vendor)
+
+1. Still on ACP, **Register New Agent** again.  
+2. Fill in:
+   - **Name:** `Atelier JP`  
+   - **Role:** **`Provider`** ← seller; offers a service  
+   - Profile picture: any small image  
+3. Create its smart wallet + whitelist the same personal wallet.  
+4. Add a **service offering**:
+   - Name: `localize-landing` (or any short name — remember it)  
+   - Price: **$0.01** to **$1.00** (keep it tiny)  
+   - Description: “Localize landing copy with brand voice”  
+5. Copy:
+
+| What you see | Put in `.env` as |
+|---|---|
+| Seller agent wallet address | `VENDOR_WALLET_ADDRESS` |
+| Offering name exactly as typed | `VENDOR_OFFERING_NAME` |
+
+---
+
+## Step 4 — Fund the BUYER with USDC on Base
+
+1. Buy/bridge a few dollars of **USDC**.  
+2. Network must be **Base** (Coinbase’s L2, chain id **8453**).  
+3. Send USDC to **`CALLIOPE_WALLET_ADDRESS`** (the Calliope Desk agent wallet).  
+4. Wrong network = funds stuck. Double-check “Base” before send.
+
+You need enough to cover the offering price (e.g. $1 offering → send ≥ $2 to be safe).
+
+---
+
+## Step 5 — Put secrets in the Calliope repo
+
+In PowerShell:
 
 ```powershell
 cd "C:\Users\Emma0\OneDrive\Documents\GitHub\sibyl labs\foreman\agent"
 copy .env.example .env
-# edit .env with the six values above
+notepad .env
 ```
 
-Restart the desk (`npm run dev` in `desk/`) so the agent process picks up env.
+Fill (example shape — use your real values):
 
-### 5. Proof check (~3 min)
+```env
+CALLIOPE_WALLET_ADDRESS=0x...
+CALLIOPE_WALLET_ID=...
+CALLIOPE_SIGNER_KEY=0x...
+CALLIOPE_BUILDER_CODE=
+VENDOR_WALLET_ADDRESS=0x...
+VENDOR_OFFERING_NAME=localize-landing
+```
+
+Save. Restart the desk (`cd desk` → stop old server → `npm run dev`).
+
+---
+
+## Step 6 — Proof it worked
 
 ```powershell
-cd agent
+cd "C:\Users\Emma0\OneDrive\Documents\GitHub\sibyl labs\foreman\agent"
 npm run org -- reset --yes
 npm run org -- found "Localize client landing copy with brand voice intact."
 npm run org -- task "Localize the landing page hero to Japanese." 1
 ```
 
-Success looks like:
-- log line `hire port: ACP(escrow on Base)` (not SIM)
-- a real job / spend / tx-ish id in the decision log
+**Success:** log says `hire port: ACP(escrow on Base)` (not `SIM`).  
+**Failure / still SIM:** say “abort ACP” — we submit Sibyl-only.
 
-Paste those six env values (redact the signer key in chat if you want — put
-it only in `.env`) and say **“env ready”** when steps 1–4 are done. I will
-drive the proof hire and update demo/README claims only if ACP is live.
+Then tell me **“env ready”** (you can hide the private key in chat).
 
-## Abort criteria
+---
 
-Abort and go Sibyl-only if any of these are true at T+30m:
-- cannot finish agent registration
-- no USDC on Base mainnet in the agent wallet
-- console still shows `SIM(no real escrow)`
-- hire throws / times out with no onchain job
+## Abort rule
 
-Do **not** claim Base or Virtuals on the build page after an abort.
+If you are not through Steps 1–4 within ~30 minutes, **stop**.  
+Do not claim Base/Virtuals on the build page. Record the memory demo instead.
