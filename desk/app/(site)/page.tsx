@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { Reveal } from "@/components/reveal";
 import { PipelineDiagram } from "@/components/pipeline-diagram";
+import { HeroTranscript } from "@/components/hero-transcript";
+import { TaglineReveal } from "@/components/tagline-reveal";
 import { Card, FeatureCard, Kicker, PillLink, StatusBadge } from "@/components/ui";
 
 const FACTS = [
   { value: "24/24", label: "deletion-test checks", state: "verified" as const },
-  { value: "2+", label: "OS processes per story", state: "verified" as const },
-  { value: "4", label: "memory domains that change decisions", state: "verified" as const },
+  { value: "5", label: "fresh processes in the test story", state: "verified" as const },
+  { value: "5", label: "memory domains, each load-bearing", state: "verified" as const },
   { value: "ACP", label: "escrow path wired, not run", state: "not-run" as const },
 ];
 
@@ -34,36 +36,43 @@ const STEPS = [
 export default function LandingPage() {
   return (
     <>
-      {/* Hero — centered, hold-first pacing (inspo: slim nav, centered cluster) */}
-      <section className="relative overflow-hidden pb-24 pt-24 sm:pt-32">
+      {/* Hero — centered hold, product story in the first screen */}
+      <section className="relative overflow-hidden pb-20 pt-16 sm:pt-20">
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-10 -z-10 h-[380px] w-[720px] -translate-x-1/2 rounded-full bg-gradient-to-r from-coral/50 via-sky-blue/50 to-mint/50 blur-[70px]"
+          className="pointer-events-none absolute left-1/2 top-6 -z-10 h-[380px] w-[720px] -translate-x-1/2 rounded-full bg-gradient-to-r from-coral/50 via-sky-blue/50 to-mint/50 blur-[70px]"
         />
         <div className="mx-auto max-w-4xl text-center">
           <Reveal>
-            <Kicker>A restart-safe organization for AI workers</Kicker>
+            <Kicker>An organization that survives its workers</Kicker>
             <h1 className="mt-6 font-untitled-serif text-heading font-normal sm:text-display">
               Your agents are employees.
               <br />
               Calliope is the company.
             </h1>
-            <p className="mx-auto mt-8 max-w-2xl text-body-lg text-graphite">
+            <p className="mx-auto mt-7 max-w-2xl text-body-lg text-graphite">
               The charter, the standards, the vendor history, and the work in
               flight live in Sibyl Memory. Kill every process — the next one
               reads the organization back and finishes the job.
             </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <PillLink href="/console" tone="blue">
                 Open the console
               </PillLink>
-              <PillLink href="/evidence" tone="ghost">
-                See the evidence
-              </PillLink>
+              <Link
+                href="/evidence"
+                className="text-body-sm uppercase tracking-[0.08em] text-graphite underline-offset-4 hover:text-off-black hover:underline"
+              >
+                See the evidence →
+              </Link>
             </div>
-            <p className="mt-8 text-body-sm text-graphite">
-              Runs locally · MIT licensed · built with Sibyl Memory
+            <p className="mt-6 text-body-sm text-graphite">
+              <span className="font-medium text-off-black">24/24 deletion checks</span> ·
+              kill the process, the org reassembles · runs locally · MIT licensed
             </p>
+          </Reveal>
+          <Reveal delay={120}>
+            <HeroTranscript />
           </Reveal>
         </div>
       </section>
@@ -120,6 +129,15 @@ export default function LandingPage() {
             </FeatureCard>
           </Reveal>
         </div>
+      </section>
+
+      {/* Tagline reveal — the held breath between problem and model */}
+      <section className="pb-[var(--section-gap)]">
+        <Reveal>
+          <TaglineReveal
+            lines={["The process is disposable.", "The company is not."]}
+          />
+        </Reveal>
       </section>
 
       {/* The model */}
