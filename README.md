@@ -17,6 +17,10 @@ project is a wrapper. Calliope is designed around the opposite test:
 > Base Sepolia settlement receipts are verified. Virtuals ACP is wired but not
 > claimed. Simulated vendor output is explicitly labeled in the desk and logs.
 
+> **Live site:** https://calliope-emmagh1s-projects.vercel.app — the five-page
+> overview is public; the interactive console runs locally (it spawns real
+> agent processes against Sibyl Memory, so it lives where your org lives).
+
 ## The problem
 
 AI workers are disposable processes. When a process restarts, a model changes,
