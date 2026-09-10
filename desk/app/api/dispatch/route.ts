@@ -10,7 +10,7 @@ import type { OrgEvent } from "../../../lib/types";
  * process just emitted.
  */
 export async function POST(req: Request) {
-  const AGENT = resolve(process.env.CHARTER_AGENT_DIR ?? "../agent");
+  const AGENT = resolve(process.env.CALLIOPE_AGENT_DIR ?? "../agent");
   let body: any = {};
   try {
     body = await req.json();

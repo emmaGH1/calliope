@@ -1,4 +1,4 @@
-/** Domain types for the Charter org. Memory IS the org; these are its shapes. */
+/** Domain types for the Calliope org. Memory IS the org; these are its shapes. */
 
 export interface Mission {
   name: string;

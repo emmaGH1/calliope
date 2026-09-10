@@ -7,7 +7,7 @@ third post after recording. Both are honest: simulated vendors are labeled.
 
 ## Post 1 — "the company is the memory" (day 1 build, after core loop worked)
 
-Your agents are employees. Charter is the company. 🏗️
+Your agents are employees. Calliope is the company. 🏗️
 
 Built for @SibylLabs' hackathon over the weekend — a workforce whose ENTIRE
 institution lives in Sibyl Memory: the charter, roles, handoff routes, client
@@ -48,7 +48,7 @@ because the company survived the employee.
 Then we stub out every memory call: bare brief, no vendor book, no ban. QA fails.
 Delete the memory and there is no company. That's not a slogan — it's `npm test`.
 
-Charter — your agents are employees. The company lives in Sibyl Memory.
+Calliope — your agents are employees. The company lives in Sibyl Memory.
 (demo video link when recorded) (repo link)
 
 #SibylHackathon #ForgettingIsABug

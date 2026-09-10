@@ -1,6 +1,6 @@
-# Charter
+# Calliope
 
-> **Your agents are employees. Charter is the company.**
+> **Your agents are employees. Calliope is the company.**
 > A workforce of AI specialist agents whose *entire institution* lives in Sibyl Memory —
 > the charter, roles, handoff routes, client standards, vendor book, and obligations.
 > Kill every process, and a fresh boot reassembles the org from memory and finishes the job.
@@ -13,7 +13,7 @@ MIT licensed · commit history is real and readable · submission: repo + demo +
 
 ## The one sentence for a judge
 
-Delete the Sibyl Memory layer and Charter does not merely work worse —
+Delete the Sibyl Memory layer and Calliope does not merely work worse —
 **it stops being an org**: every boot re-founds itself from nothing, sends briefs
 with no standards, knows no vendors, and repeats the exact mistakes the last
 session learned to ban. Run `npm test` in `agent/` to watch that happen.
@@ -21,7 +21,7 @@ session learned to ban. Run `npm test` in `agent/` to watch that happen.
 ## Why this entry
 
 The ecosystem's serious agents all keep *one* list in memory: a grudge, a credit file,
-a payment cache. Charter's claim is larger: **the organization itself is the memory.**
+a payment cache. Calliope's claim is larger: **the organization itself is the memory.**
 Nothing org-level is hardcoded — no role table, no vendor list, no policy in code.
 The charter is written *into* Sibyl at founding and read back by every fresh process,
 so agents are hot-swappable, processes are disposable, and the company survives them all.
@@ -88,7 +88,7 @@ Optional env (`agent/.env`, copied from `agent/.env.example`):
 | Variable | Purpose |
 | --- | --- |
 | `OPENAI_API_KEY` / `XAI_API_KEY` | real LLM brains for editor/QA (default: deterministic STUB, labeled in output) |
-| `CHARTER_WALLET_ADDRESS`, `CHARTER_WALLET_ID`, `CHARTER_SIGNER_KEY`, `CHARTER_BUILDER_CODE` | real ACP hires (Virtuals Agent Commerce Protocol, escrow on Base) |
+| `CALLIOPE_WALLET_ADDRESS`, `CALLIOPE_WALLET_ID`, `CALLIOPE_SIGNER_KEY`, `CALLIOPE_BUILDER_CODE` | real ACP hires (Virtuals Agent Commerce Protocol, escrow on Base) |
 | `VENDOR_WALLET_ADDRESS`, `VENDOR_OFFERING_NAME` | the vendor agent's registered offering |
 | `SIBYL_PYTHON` | override for the Sibyl server python. Default resolution probes: `SIBYL_PYTHON` → the `uv tool` venv python → `python`/`python3`/`py` (import check) → the `sibyl-memory-mcp` console script on PATH |
 
@@ -127,7 +127,7 @@ asserts the regression in 24 checks across real processes, including real recall
 persistence proof (amnesic writes are verifiably absent; session writes are verifiably
 present). `npm run org -- reset --yes` deletes the local store for pristine takes —
 Sibyl's `wipe`/forget *archives* entities by design, and the append-only journal
-survives an entity wipe (Charter treats that residue as honest history; QA consults it).
+survives an entity wipe (Calliope treats that residue as honest history; QA consults it).
 
 Notes a judge may appreciate: Sibyl wraps every recall in an untrusted-context
 fence and returns self-explaining verdicts on empty searches; we treat memory as
@@ -161,7 +161,7 @@ deliverable text.
 - **Sibyl Memory (required, never counts as a bonus)**: the org itself — see above.
 - **Virtuals (ACP)**: `AcpHirePort` (`agent/src/org/acp-hire.ts`) buys real work through
   the Agent Commerce Protocol — job offers, escrow, evaluation, USDC settlement on Base —
-  when registration env is present (`CHARTER_*`, `VENDOR_*`; registered at app.virtuals.io/acp).
+  when registration env is present (`CALLIOPE_*`, `VENDOR_*`; registered at app.virtuals.io/acp).
   **Status: implemented against the SDK's actual types; NOT yet exercised live — honest
   disclosure:** sim stays the default until the agents are registered and one escrow job
   has settled. The multiplier claim follows evidence, not intent.
@@ -185,7 +185,7 @@ deliverable text.
 ## Prior Work declaration
 
 Built Sep 7–10 2026 entirely within the hackathon window in this repository
-(`foreman/`, MIT). The author previously built an onchain document-verification
+(`calliope/`, MIT). The author previously built an onchain document-verification
 project (Redline, X Layer, Aug 2026) and reuses *patterns only* — Next.js +
 Tailwind project shape and editorial design taste — no code was copied; that
 project had no memory layer and no ACP/agent code. Its prior repo is not part

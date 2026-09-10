@@ -10,7 +10,7 @@ export interface BootReport {
 }
 
 const SEED_MISSION: Omit<Mission, "foundedAt"> = {
-  name: "Charter Demo Org",
+  name: "Calliope Demo Org",
   mission:
     "Localize client landing copy with brand voice intact, on budget, every time.",
   clientStandards: [

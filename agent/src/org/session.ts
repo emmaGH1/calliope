@@ -1,5 +1,5 @@
 /**
- * One Charter session per process invocation — restarts are REAL restarts.
+ * One Calliope session per process invocation — restarts are REAL restarts.
  *
  *   npx tsx src/org/session.ts boot                   -> found or reconstitute, report
  *   npx tsx src/org/session.ts found "Mission text"   -> found the org from a paragraph
@@ -146,7 +146,7 @@ async function main() {
       const taskText = positionals[1] ?? "Localize the landing page hero to Japanese. Keep the brand voice.";
       const budget = positionals[2] ? Number(positionals[2]) : 3;
       const { port: hire, real } = hirePortForEnv();
-      log.emit("hire-port", `hire port: ${hire.label}${real ? "" : " (real ACP activates with CHARTER_* env)"}`, { label: hire.label, real });
+      log.emit("hire-port", `hire port: ${hire.label}${real ? "" : " (real ACP activates with CALLIOPE_* env)"}`, { label: hire.label, real });
       print(mem, `hire port: ${hire.label}`);
 
       // crash beat: write the obligation, then die before completing it

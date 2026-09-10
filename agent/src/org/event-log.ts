@@ -31,7 +31,7 @@ export class EventLog {
   private pid = process.pid;
 
   constructor(path?: string) {
-    this.path = resolve(path ?? process.env.CHARTER_EVENT_LOG ?? "events.jsonl");
+    this.path = resolve(path ?? process.env.CALLIOPE_EVENT_LOG ?? "events.jsonl");
   }
 
   emit(kind: OrgEvent["kind"], text: string, data?: unknown): OrgEvent {

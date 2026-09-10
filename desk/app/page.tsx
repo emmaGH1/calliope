@@ -124,7 +124,7 @@ export default function Desk() {
       {/* header */}
       <header className="flex items-center justify-between border-b border-ash py-6">
         <div className="flex items-baseline gap-6">
-          <h1 className="font-serif-ed text-[28px] font-normal tracking-[-0.02em]">Charter</h1>
+          <h1 className="font-serif-ed text-[28px] font-normal tracking-[-0.02em]">Calliope</h1>
           <p className="text-xs uppercase tracking-widest text-smoke">
             the org that lives in memory · sibyl labs 2026
           </p>

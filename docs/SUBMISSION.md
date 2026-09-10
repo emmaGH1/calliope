@@ -7,7 +7,7 @@ Judging Sep 11–12. Winners announced Sep 13–15.
 
 | # | Deliverable | State | Remaining (user-side) |
 | --- | --- | --- | --- |
-| 1 | Public repo, OSI license, real commit history | READY — `foreman/` MIT; 5+ commits Sep 7–9 | create/push public GitHub repo (e.g. `charter-org`), confirm link |
+| 1 | Public repo, OSI license, real commit history | READY — `calliope/` MIT; 5+ commits Sep 7–9 | create/push public GitHub repo (e.g. `charter-org`), confirm link |
 | 2 | Demo video 2–5 min with fresh-session recall moment | SCRIPT READY — `docs/DEMO_SCRIPT.md` | record per script (OBS/Game Bar), ~20 min incl. retakes |
 | 3 | Team & partner stacks named | READY in README (Sibyl; Virtuals ACP env-gated — disclose NOT RUN; Base via ACP) | register agents → real ACP take if time permits (optional; ×1.25 depends on it) |
 | 4 | Memory implementation note | READY in README ("Memory implementation note" + read/write site table + deletion test) | — |

@@ -5,7 +5,7 @@ import type { OrgEvent } from "../../../lib/types";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const AGENT = resolve(process.env.CHARTER_AGENT_DIR ?? "../agent");
+  const AGENT = resolve(process.env.CALLIOPE_AGENT_DIR ?? "../agent");
   const path = resolve(AGENT, "events.jsonl");
   try {
     const raw = readFileSync(path, "utf8");

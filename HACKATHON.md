@@ -1,4 +1,4 @@
-# Hackathon record — Charter (working repo dir: foreman/)
+# Hackathon record — Calliope (working repo dir: calliope/)
 
 ## Event and clock
 - Event / official URL: Sibyl Labs Hackathon — https://hack.sibyllabs.org/
@@ -46,7 +46,7 @@
   lanes: payment dedup (Coral, HaggleMind), authorization/rules (Pact,
   OnRecord, GoBRA), scar memory (Vesper), meta data-layer (Dejavu). Almost all
   = one agent + a list; memory as inhibitor/consequence.
-- PIVOT DECISION (2026-09-07): original "Foreman" concept sat directly in the
+- PIVOT DECISION (2026-09-07): original "Calliope" concept sat directly in the
   GRUDGE/Continuum spotlight lane → pivoted to the open lane: memory as the
   institution itself. Skeleton (orchestrator, vendor agents, memory, desk)
   unchanged; framing and one memory domain added.
@@ -54,7 +54,7 @@
   workforce; workaround = state lives in prompts/context windows, so restarts,
   crashes, and model swaps lose the "company" and the user re-explains
   everything
-- Concept: CHARTER — "Your agents are employees; Charter is the company."
+- Concept: CHARTER — "Your agents are employees; Calliope is the company."
   A workforce of specialist agents whose entire institution lives in Sibyl
   Memory: org charter, roles, handoff routes, client standards, vendor book,
   in-flight obligations. Nothing org-level is hardcoded. Kill every process →
@@ -75,7 +75,7 @@
 - Riskiest assumption / experiment / observed result / fallback:
   ACP end-to-end job usable in our timeframe (spike A, day 1). Fallback: own
   vendor agents + x402 USDC payments on Base (keeps Base ×1.15, drops Virtuals)
-- Alternatives considered / rejection reasons: Foreman/Casebook (crowded
+- Alternatives considered / rejection reasons: Calliope/Casebook (crowded
   spotlight lane / prior-work risk), Creditmind (two-sided, heavy),
   The Witness (no coordination pattern), XP Market (hard to demo), taste-
   convergence agent (single-agent, weak coordination fit — folded in as the

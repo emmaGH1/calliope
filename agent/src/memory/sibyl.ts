@@ -86,7 +86,7 @@ export class SibylMemory {
     const { command, args } = resolveSibylServer();
     this.transport = new StdioClientTransport({ command, args });
     this.client = new Client(
-      { name: "charter-agent", version: "0.1.0" },
+      { name: "calliope-agent", version: "0.1.0" },
       { capabilities: {} }
     );
     await this.client.connect(this.transport);

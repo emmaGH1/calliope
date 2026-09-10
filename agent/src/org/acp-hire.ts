@@ -6,23 +6,23 @@ import type { VendorRecord } from "./types.js";
 
 /**
  * ACP hire port: real Agent Commerce Protocol jobs (escrow + payment on
- * Base) once agents are registered. The Charter desk agent acts as the
+ * Base) once agents are registered. The Calliope desk agent acts as the
  * buyer/client; the vendor book entry's walletAddress/offeringName are the
  * provider. UNTESTED until registration env exists — SimHirePort remains
  * the default until then (env-gated below, never silently mixed).
  *
  * Env required (per registered agent page on app.virtuals.io/acp):
- *   CHARTER_WALLET_ADDRESS  CHARTER_WALLET_ID
- *   CHARTER_SIGNER_KEY      CHARTER_BUILDER_CODE (optional)
+ *   CALLIOPE_WALLET_ADDRESS  CALLIOPE_WALLET_ID
+ *   CALLIOPE_SIGNER_KEY      CALLIOPE_BUILDER_CODE (optional)
  *   VENDOR_WALLET_ADDRESS   VENDOR_OFFERING_NAME
  */
 export class AcpHirePort implements HirePort {
   readonly label = "ACP(escrow on Base)";
 
   async hire(vendor: VendorRecord, req: { task: string; standards: string[] }) {
-    const walletAddress = process.env.CHARTER_WALLET_ADDRESS;
-    const walletId = process.env.CHARTER_WALLET_ID;
-    const signerPrivateKey = process.env.CHARTER_SIGNER_KEY;
+    const walletAddress = process.env.CALLIOPE_WALLET_ADDRESS;
+    const walletId = process.env.CALLIOPE_WALLET_ID;
+    const signerPrivateKey = process.env.CALLIOPE_SIGNER_KEY;
     const providerAddress = vendor.walletAddress ?? process.env.VENDOR_WALLET_ADDRESS;
     const offeringName = vendor.offeringName ?? process.env.VENDOR_OFFERING_NAME;
     if (!walletAddress || !walletId || !signerPrivateKey || !providerAddress || !offeringName) {
@@ -35,8 +35,8 @@ export class AcpHirePort implements HirePort {
         walletId,
         signerPrivateKey,
         chains: [base],
-        ...(process.env.CHARTER_BUILDER_CODE
-          ? { builderCode: process.env.CHARTER_BUILDER_CODE }
+        ...(process.env.CALLIOPE_BUILDER_CODE
+          ? { builderCode: process.env.CALLIOPE_BUILDER_CODE }
           : {}),
       }),
     });
@@ -114,9 +114,9 @@ export class AcpHirePort implements HirePort {
 /** Env-gated factory: real ACP only when registration is configured. */
 export function hirePortForEnv(): { port: HirePort; real: boolean } {
   const ready = !!(
-    process.env.CHARTER_WALLET_ADDRESS &&
-    process.env.CHARTER_WALLET_ID &&
-    process.env.CHARTER_SIGNER_KEY &&
+    process.env.CALLIOPE_WALLET_ADDRESS &&
+    process.env.CALLIOPE_WALLET_ID &&
+    process.env.CALLIOPE_SIGNER_KEY &&
     process.env.VENDOR_WALLET_ADDRESS
   );
   return ready ? { port: new AcpHirePort(), real: true } : { port: new SimHirePort(), real: false };
