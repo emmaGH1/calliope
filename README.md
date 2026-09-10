@@ -186,6 +186,16 @@ The integration lives in `agent/src/memory/sibyl.ts`. Typed domain access is in
 - `test/deletion-test.ts`: 24 assertions across process boundaries, including
   real recall checks.
 
+## How memory made this possible
+
+Calliope is not an agent with a notebook. The organization itself is stored
+state. A later process can skip a banned vendor, attach remembered client
+standards, and finish interrupted work only because those facts survived the
+previous process in Sibyl. Remove the memory layer and there is no charter,
+no role table, no vendor book, and no obligation to resume — the product
+cannot do what it claims. That is why the deletion test is the proof, not a
+side demo.
+
 ## UI design
 
 The site follows the design contract in `DESIGN.md` (kept in-repo): warm

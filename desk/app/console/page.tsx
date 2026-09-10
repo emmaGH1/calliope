@@ -71,8 +71,31 @@ export default function ConsolePage() {
     "Localize the landing page hero to Japanese. Keep the brand voice."
   );
   const [budget, setBudget] = useState("3");
+  const [budgetError, setBudgetError] = useState<string | null>(null);
   const [amnesic, setAmnesic] = useState(false);
+  const [wipeArmed, setWipeArmed] = useState(false);
+  const [logFilter, setLogFilter] = useState<"all" | "decision" | "vendor" | "system">("all");
   const logRef = useRef<HTMLDivElement>(null);
+  const wipeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const budgetValid = (raw: string) =>
+    /^\d+(\.\d{1,2})?$/.test(raw.trim()) && Number(raw) > 0 && Number(raw) <= 1000;
+
+  const onBudgetChange = (raw: string) => {
+    const cleaned = raw.replace(/[^\d.]/g, "");
+    setBudget(cleaned);
+    setBudgetError(
+      cleaned.trim() === "" || budgetValid(cleaned)
+        ? null
+        : "Enter a number between 0 and 1000."
+    );
+  };
+
+  /** Textareas grow with their content; the mission paragraph never scrolls. */
+  const autogrow = (el: HTMLTextAreaElement, minPx: number) => {
+    el.style.height = "auto";
+    el.style.height = `${Math.max(minPx, el.scrollHeight)}px`;
+  };
 
   const refresh = useCallback(async () => {
     try {
@@ -96,14 +119,12 @@ export default function ConsolePage() {
   }, [events.length]);
 
   const dispatch = async (cmd: string, opts: { crash?: boolean } = {}) => {
-    if (
-      cmd === "wipe" &&
-      !confirm(
-        "Wipe the org from memory? Entities are archived (Sibyl keeps journal residue) — the next boot founds from nothing."
-      )
-    ) {
+    if ((cmd === "task" || cmd === "amnesic-task") && !budgetValid(budget)) {
+      setBudgetError("Enter a number between 0 and 1000.");
       return;
     }
+    if (wipeTimer.current) clearTimeout(wipeTimer.current);
+    setWipeArmed(false);
     setBusy(true);
     setError(null);
     try {
@@ -115,7 +136,7 @@ export default function ConsolePage() {
           crash: Boolean(opts.crash),
           mission,
           text: task,
-          budget: Number(budget) || 3,
+          budget: budgetValid(budget) ? Number(budget) : 3,
         }),
       });
       const j = await r.json();
@@ -171,6 +192,31 @@ export default function ConsolePage() {
     () => [...sorted].reverse().find((e) => e.kind === "hire-port"),
     [sorted]
   );
+  const filteredLog = useMemo(() => {
+    if (logFilter === "all") return sorted;
+    if (logFilter === "decision") {
+      return sorted.filter(
+        (e) => e.kind === "decision" || e.kind === "refusal" || e.kind === "wipe"
+      );
+    }
+    if (logFilter === "vendor") {
+      return sorted.filter((e) => e.kind === "vendor" || e.kind === "hire-port");
+    }
+    return sorted.filter(
+      (e) =>
+        e.kind !== "decision" &&
+        e.kind !== "refusal" &&
+        e.kind !== "wipe" &&
+        e.kind !== "vendor" &&
+        e.kind !== "hire-port"
+    );
+  }, [sorted, logFilter]);
+
+  useEffect(() => {
+    return () => {
+      if (wipeTimer.current) clearTimeout(wipeTimer.current);
+    };
+  }, []);
 
   return (
     <main id="main" className="mx-auto max-w-[var(--page-max-width)] px-6 pb-16 sm:px-10">
@@ -234,15 +280,18 @@ export default function ConsolePage() {
             <textarea
               id="mission"
               value={mission}
-              onChange={(e) => setMission(e.target.value)}
+              onChange={(e) => {
+                setMission(e.target.value);
+                autogrow(e.target, 104);
+              }}
               rows={4}
-              className="mt-3 w-full resize-none rounded-2xl border border-ash bg-transparent p-4 text-body outline-none focus:border-off-black"
+              className="mt-3 min-h-[104px] w-full resize-none rounded-2xl border border-ash bg-transparent p-4 text-body outline-none focus:border-off-black"
             />
             <button
               type="button"
               onClick={() => dispatch("found")}
               disabled={busy}
-              className="mt-4 w-full rounded-full bg-off-black px-6 py-4 text-body-sm uppercase tracking-[0.08em] text-parchment transition-colors hover:bg-graphite disabled:opacity-40"
+              className="press mt-4 w-full rounded-full bg-off-black px-6 py-4 text-body-sm uppercase tracking-[0.08em] text-parchment hover:bg-graphite disabled:opacity-40"
             >
               Found the org from this paragraph
             </button>
@@ -255,27 +304,41 @@ export default function ConsolePage() {
             <textarea
               id="task"
               value={task}
-              onChange={(e) => setTask(e.target.value)}
+              onChange={(e) => {
+                setTask(e.target.value);
+                autogrow(e.target, 76);
+              }}
               rows={3}
-              className="mt-3 w-full resize-none rounded-2xl border border-ash bg-transparent p-4 text-body outline-none focus:border-off-black"
+              className="mt-3 min-h-[76px] w-full resize-none rounded-2xl border border-ash bg-transparent p-4 text-body outline-none focus:border-off-black"
             />
-            <div className="mt-4 flex items-center gap-4">
-              <label htmlFor="budget" className="text-body-sm text-graphite">
+            <div className="mt-4 flex items-start gap-4">
+              <label htmlFor="budget" className="pt-2 text-body-sm text-graphite">
                 Budget (USDC)
               </label>
-              <input
-                id="budget"
-                inputMode="decimal"
-                value={budget}
-                onChange={(e) => setBudget(e.target.value.replace(/[^\d.]/g, ""))}
-                className="w-24 rounded-2xl border border-ash bg-transparent px-4 py-2 text-body outline-none focus:border-off-black"
-              />
+              <div className="w-32">
+                <input
+                  id="budget"
+                  inputMode="decimal"
+                  value={budget}
+                  aria-invalid={budgetError ? true : undefined}
+                  aria-describedby={budgetError ? "budget-error" : undefined}
+                  onChange={(e) => onBudgetChange(e.target.value)}
+                  className={`w-full rounded-2xl border bg-transparent px-4 py-2 text-body outline-none focus:border-off-black ${
+                    budgetError ? "border-crimson" : "border-ash"
+                  }`}
+                />
+                {budgetError && (
+                  <p id="budget-error" role="alert" className="mt-1 text-caption text-crimson">
+                    {budgetError}
+                  </p>
+                )}
+              </div>
             </div>
             <button
               type="button"
               onClick={() => dispatch(amnesic ? "amnesic-task" : "task")}
-              disabled={busy}
-              className="mt-5 w-full rounded-full bg-lake-blue px-6 py-4 text-body-sm uppercase tracking-[0.08em] text-parchment transition-colors hover:bg-off-black disabled:opacity-40"
+              disabled={busy || !!budgetError}
+              className="press mt-5 w-full rounded-full bg-lake-blue px-6 py-4 text-body-sm uppercase tracking-[0.08em] text-parchment hover:bg-off-black disabled:opacity-40 aria-disabled:cursor-not-allowed"
             >
               {amnesic ? "Run amnesic (no memory) ▸" : "Dispatch task ▸"}
             </button>
@@ -294,7 +357,7 @@ export default function ConsolePage() {
                 onClick={() => dispatch("task", { crash: true })}
                 disabled={busy || amnesic}
                 title={amnesic ? "Crash simulation applies to live tasks only" : undefined}
-                className="rounded-full border border-ash px-5 py-2 text-caption uppercase tracking-[0.12em] text-graphite transition-colors hover:border-off-black hover:text-off-black disabled:opacity-40"
+                className="press rounded-full border border-ash px-5 py-2.5 text-caption uppercase tracking-[0.12em] text-graphite hover:border-off-black hover:text-off-black disabled:opacity-40"
               >
                 Crash mid-task
               </button>
@@ -309,12 +372,30 @@ export default function ConsolePage() {
             </p>
             <button
               type="button"
-              onClick={() => dispatch("wipe")}
+              onClick={() => {
+                if (wipeArmed) {
+                  void dispatch("wipe");
+                  return;
+                }
+                setWipeArmed(true);
+                wipeTimer.current = setTimeout(() => setWipeArmed(false), 3000);
+              }}
               disabled={busy}
-              className="mt-4 w-full rounded-full border border-graphite px-6 py-3 text-body-sm uppercase tracking-[0.08em] text-graphite transition-colors hover:border-off-black hover:text-off-black disabled:opacity-40"
+              aria-live="polite"
+              className={`press mt-4 w-full rounded-full px-6 py-3 text-body-sm uppercase tracking-[0.08em] disabled:opacity-40 ${
+                wipeArmed
+                  ? "bg-off-black text-parchment"
+                  : "border border-graphite text-graphite hover:border-off-black hover:text-off-black"
+              }`}
             >
-              Wipe org from memory (archives)
+              {wipeArmed ? "Click again to archive the org" : "Wipe org from memory (archives)"}
             </button>
+            {wipeArmed && (
+              <p className="mt-2 text-caption text-graphite">
+                Entities are archived; the journal keeps its residue. This
+                resets itself in a few seconds.
+              </p>
+            )}
           </Panel>
         </div>
 
@@ -343,15 +424,25 @@ export default function ConsolePage() {
                     )}
                   </>
                 ) : (
-                  <p className="text-body text-graphite">
-                    No charter in memory yet — found the org first.
-                  </p>
+                  <div className="rounded-2xl border border-dashed border-ash p-6">
+                    <p className="text-body text-graphite">
+                      No charter in memory yet — the org has not been founded.
+                    </p>
+                    <p className="mt-2 text-body-sm text-graphite">
+                      Run step <span className="font-medium text-off-black">① Found</span> in
+                      the walkthrough above, or write a mission and press the
+                      black button.
+                    </p>
+                  </div>
                 )}
               </div>
               <div>
                 <h3 className="text-caption uppercase tracking-[0.18em] text-graphite">Vendor book</h3>
                 {vendors.length === 0 ? (
-                  <p className="mt-4 text-body text-graphite">Empty until the org is founded.</p>
+                  <p className="mt-4 text-body-sm text-graphite">
+                    Empty until the org is founded — step ① writes two vendors
+                    into memory.
+                  </p>
                 ) : (
                   <ul className="mt-4 flex flex-col">
                     {vendors.map((v, i) => {
@@ -384,8 +475,18 @@ export default function ConsolePage() {
           </Panel>
 
           <Panel step="05" title="Decision record">
-            {decisions.length === 0 ? (
-              <p className="text-body text-graphite">Nothing decided yet.</p>
+            {busy ? (
+              <div className="flex flex-col gap-4" aria-label="A worker process is deciding">
+                <div className="skeleton h-6 w-2/3" />
+                <div className="skeleton h-4 w-1/2" />
+                <div className="skeleton h-4 w-5/6" />
+                <div className="skeleton h-4 w-3/5" />
+              </div>
+            ) : decisions.length === 0 ? (
+              <p className="text-body-sm text-graphite">
+                Nothing decided yet — dispatch a task (step ②) and every choice
+                will appear here with the memory row that caused it.
+              </p>
             ) : (
               <>
                 <div className="rounded-2xl bg-periwinkle-mist p-6">
@@ -463,7 +564,26 @@ export default function ConsolePage() {
         </div>
         <div className="lg:col-span-7">
           <section className="flex h-full flex-col rounded-3xl bg-off-black p-8 sm:p-10">
-            <h2 className="text-caption uppercase tracking-[0.18em] text-ash">07 · Run log</h2>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <h2 className="text-caption uppercase tracking-[0.18em] text-ash">07 · Run log</h2>
+              <div className="flex gap-2" role="group" aria-label="Filter run log">
+                {(["all", "decision", "vendor", "system"] as const).map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    onClick={() => setLogFilter(f)}
+                    aria-pressed={logFilter === f}
+                    className={`press rounded-full px-3 py-1 text-caption uppercase tracking-[0.12em] ${
+                      logFilter === f
+                        ? "bg-parchment text-off-black"
+                        : "border border-graphite text-ash hover:text-parchment"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div
               ref={logRef}
               tabIndex={0}
@@ -471,17 +591,21 @@ export default function ConsolePage() {
               aria-label="Run log"
               className="mt-6 max-h-80 flex-1 overflow-y-auto pr-2"
             >
-              {sorted.map((e, i) => (
-                <p
-                  key={`${eventKey(e)}-${i}`}
-                  className={`border-b border-graphite py-2 text-caption leading-relaxed ${
-                    KIND_TONE[e.kind] ?? "text-ash"
-                  }`}
-                >
-                  <span className="text-smoke">{fmt(e.ts)}</span> pid{e.pid}{" "}
-                  <span className="uppercase tracking-[0.1em] text-smoke">{e.kind}</span> — {e.text}
-                </p>
-              ))}
+              {filteredLog.length === 0 ? (
+                <p className="text-caption text-ash">No {logFilter} events yet.</p>
+              ) : (
+                filteredLog.map((e, i) => (
+                  <p
+                    key={`${eventKey(e)}-${i}`}
+                    className={`border-b border-graphite py-2 text-caption leading-relaxed ${
+                      KIND_TONE[e.kind] ?? "text-ash"
+                    }`}
+                  >
+                    <span className="text-smoke">{fmt(e.ts)}</span> pid{e.pid}{" "}
+                    <span className="uppercase tracking-[0.1em] text-smoke">{e.kind}</span> — {e.text}
+                  </p>
+                ))
+              )}
             </div>
           </section>
         </div>

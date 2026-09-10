@@ -19,9 +19,9 @@ export function SiteNav() {
   return (
     <header className="border-b border-ash">
       <div className="mx-auto flex h-20 max-w-[var(--page-max-width)] items-center justify-between gap-6 px-6 sm:px-10">
-        <Link href="/" className="flex items-center gap-3" aria-label="Calliope home">
-          <Image src="/calliope-logo.png" alt="" width={30} height={30} priority />
-          <span className="font-untitled-serif text-subheading font-normal">Calliope</span>
+        <Link href="/" className="flex items-center gap-4" aria-label="Calliope home">
+          <Image src="/calliope-logo.png" alt="" width={38} height={38} priority />
+          <span className="font-untitled-serif text-heading-sm font-normal">Calliope</span>
         </Link>
 
         <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">
@@ -32,7 +32,7 @@ export function SiteNav() {
                 key={l.href}
                 href={l.href}
                 aria-current={active ? "page" : undefined}
-                className={`text-label uppercase tracking-[0.06em] transition-colors ${
+                className={`press text-label uppercase tracking-[0.06em] ${
                   active ? "font-medium text-off-black" : "text-graphite hover:text-off-black"
                 }`}
               >
@@ -47,13 +47,13 @@ export function SiteNav() {
             href="https://github.com/emmaGH1/calliope"
             target="_blank"
             rel="noreferrer"
-            className="rounded-full border border-off-black px-6 py-3 text-body-sm uppercase tracking-[0.08em] transition-colors hover:bg-off-black hover:text-parchment"
+            className="press rounded-full border border-off-black px-6 py-3 text-body-sm uppercase tracking-[0.08em] hover:bg-off-black hover:text-parchment"
           >
             GitHub
           </a>
           <Link
             href="/console"
-            className="rounded-full bg-lake-blue px-6 py-3 text-body-sm uppercase tracking-[0.08em] text-parchment transition-colors hover:bg-off-black"
+            className="press rounded-full bg-lake-blue px-6 py-3 text-body-sm uppercase tracking-[0.08em] text-parchment hover:bg-off-black"
           >
             Open console
           </Link>
@@ -64,7 +64,7 @@ export function SiteNav() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="site-menu"
-          className="rounded-full border border-off-black px-5 py-2 text-body-sm uppercase tracking-[0.08em] lg:hidden"
+          className="press rounded-full border border-off-black px-5 py-2 text-body-sm uppercase tracking-[0.08em] lg:hidden"
         >
           {open ? "Close" : "Menu"}
         </button>

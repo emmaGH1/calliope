@@ -58,7 +58,7 @@ export function Card({
     ink: "bg-off-black text-parchment",
   } as const;
   return (
-    <div className={`rounded-3xl p-10 ${tones[tone]} ${className}`}>{children}</div>
+    <div className={`card-hover rounded-3xl p-10 ${tones[tone]} ${className}`}>{children}</div>
   );
 }
 
@@ -96,7 +96,7 @@ export function PillLink({
     black: "bg-off-black text-parchment hover:bg-graphite",
     ghost: "border border-off-black text-off-black hover:bg-off-black hover:text-parchment",
   } as const;
-  const cls = `inline-flex items-center gap-2 rounded-full px-8 py-4 text-body-sm uppercase tracking-[0.08em] transition-colors ${tones[tone]}`;
+  const cls = `press inline-flex items-center gap-2 rounded-full px-8 py-4 text-body-sm uppercase tracking-[0.08em] ${tones[tone]}`;
   return external ? (
     <a href={href} target="_blank" rel="noreferrer" className={cls}>
       {children}

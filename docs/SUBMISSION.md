@@ -3,21 +3,25 @@
 Mark-ready deadline: **Sep 10, 2026, 23:59 UTC** (internal cutoff 20:00 UTC).
 Judging Sep 11–12. Winners announced Sep 13–15.
 
+**Do not chase ACP/Base tonight.** Those stacks are wired and labeled NOT RUN.
+Claiming them without an on-camera transaction is smoke. Sibyl-only (×1.00)
+plus a clean recall demo is the placement path.
+
 ## Required deliverables (per /submissions)
 
 | # | Deliverable | State | Remaining (user-side) |
 | --- | --- | --- | --- |
-| 1 | Public repo, OSI license, real commit history | READY — Calliope, MIT; milestone history in local repository | push/confirm the public GitHub repository: https://github.com/emmaGH1/calliope |
-| 2 | Demo video 2–5 min with fresh-session recall moment | SCRIPT READY — `docs/DEMO_SCRIPT.md` | record per script (OBS/Game Bar), ~20 min incl. retakes |
-| 3 | Team & partner stacks named | READY in README (Sibyl; Virtuals ACP env-gated — disclose NOT RUN; Base via ACP) | register agents → real ACP take if time permits (optional; ×1.25 depends on it) |
-| 4 | Memory implementation note | READY in README ("Memory implementation note" + read/write site table + deletion test) | — |
-| + | Build-in-public posts | DRAFTS READY — `docs/POSTS.md` | post 2× from X, add links to build page |
+| 1 | Public repo, OSI license, real commit history | READY — https://github.com/emmaGH1/calliope (public, MIT) | push remaining desk/docs commits |
+| 2 | Demo video 2–5 min with fresh-session recall moment | SCRIPT READY — `docs/DEMO_SCRIPT.md` | record now (OBS/Game Bar); clock visible; sims labeled |
+| 3 | Team & partner stacks named | READY in README: Sibyl required; Virtuals/Base NOT RUN — do not claim | — |
+| 4 | Memory implementation note | READY in README (domains + read/write map + "How memory made this possible") | paste into build page |
+| + | Build-in-public posts | DRAFTS READY — `docs/POSTS.md` | post 2× tagging **@sibylcap** (not @SibylLabs); no Base/Virtuals claim |
 
 ## Build-page steps (user has the private link)
 
-1. Add repo URL (public GitHub).
-2. Add demo video + post links.
-3. Fill team/stacks + memory note (copy from README sections).
+1. Add repo URL: https://github.com/emmaGH1/calliope
+2. Add demo video + both post links.
+3. Stacks: Sibyl Memory only. Copy the README memory note.
 4. **Mark ready** — before Sep 10 23:59 UTC. Keep the internal 20:00 UTC cutoff.
 
 ## Evidence references for the build page / README

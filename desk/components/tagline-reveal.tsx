@@ -34,9 +34,9 @@ export function TaglineReveal({ lines }: { lines: string[] }) {
           const tick = () => {
             i += 1;
             setActive(i);
-            if (i < total) setTimeout(tick, 130);
+            if (i < total) setTimeout(tick, 200);
           };
-          setTimeout(tick, 150);
+          setTimeout(tick, 200);
         }
       },
       { threshold: 0.4 }

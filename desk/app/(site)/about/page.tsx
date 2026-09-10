@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Reveal } from "@/components/reveal";
 import { Card, Kicker, PillLink } from "@/components/ui";
 import { Faq } from "@/components/faq";
@@ -110,13 +111,24 @@ const ROADMAP = [
 export default function AboutPage() {
   return (
     <>
-      <section className="pb-16 pt-24 sm:pt-32">
+      <section className="pb-16 pt-20 sm:pt-24">
         <Reveal>
-          <Kicker>About</Kicker>
-          <h1 className="mt-6 max-w-4xl font-untitled-serif text-heading font-normal sm:text-display">
-            Why Calliope exists.
-          </h1>
-          <p className="mt-8 max-w-2xl text-body-lg text-graphite">
+          <div className="flex flex-col items-start gap-10 sm:flex-row sm:items-center sm:gap-14">
+            <Image
+              src="/calliope-logo.png"
+              alt="The Calliope mark"
+              width={112}
+              height={112}
+              priority
+            />
+            <div>
+              <Kicker>About</Kicker>
+              <h1 className="mt-4 max-w-3xl font-untitled-serif text-heading font-normal sm:text-heading-lg">
+                Why Calliope exists.
+              </h1>
+            </div>
+          </div>
+          <p className="mt-10 max-w-2xl text-body-lg text-graphite">
             Most agent memory projects keep a list: a grudge, a credit file, a
             cache of payments. Calliope asks a larger question — what if the
             memory is the organization itself?

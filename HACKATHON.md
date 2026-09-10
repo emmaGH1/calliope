@@ -4,11 +4,12 @@
 - Event / official URL: Sibyl Labs Hackathon — https://hack.sibyllabs.org/
 - Official deadline / timezone: mark submission ready before Sep 10, 2026, 23:59 UTC
 - User timezone / converted deadline: WAT (UTC+1) → Sep 11, 00:59 WAT
-- Time checked: 2026-09-07 (event pages fetched same day)
-- Available working hours / assumptions: solo, 8+ h/day, Sep 7–10 (~26 h)
-- Internal submission cutoff / reserve: Sep 10, 20:00 UTC (4 h reserve)
+- Time checked: 2026-09-10 16:41 UTC (event pages re-fetched same day)
+- Available working hours / assumptions: solo; remaining calendar ~7 h to
+  23:59 UTC; productive budget ~3 h before the 20:00 UTC cutoff
+- Internal submission cutoff / reserve: Sep 10, 20:00 UTC (~3 h remaining)
 - Original event format: online; single challenge, no tracks
-- Current mode: short sprint (entered on day 7 of 10-day window)
+- Current mode: rescue (deadline day; product built; submission incomplete)
 - Primary award objective: strongest overall entry ($4,000 first prize);
   all placements 1–5 pay ($4k/$2.5k/$1.5k/$1k/$1k, USDC on Base)
 
@@ -25,19 +26,21 @@
 - Required artifacts / limits / access: public repo (MIT/Apache-2.0) with real
   commit history + README setup instructions; 2–5 min demo video with a fresh
   session recalling earlier state (unedited segment, on-screen timestamp or
-  commit hash); name builders + every Base/Virtuals stack; memory
+  commit hash); name builders + every Base/Virtuals stack *claimed*; memory
   implementation note (what is persisted/recalled/how it changes decisions);
-  build-in-public posts on the build page; repo + demo + posts added to the
-  private link, then marked ready
+  two public posts tagging @sibylcap and each claimed partner (demo video +
+  at least one build-log); repo + demo + posts added to the private link,
+  then marked ready
 - Sources (URL, accessed date, requirement):
-  - https://hack.sibyllabs.org/ (2026-09-07): theme, prizes, dates, rubric, multipliers
-  - https://hack.sibyllabs.org/rules (2026-09-07): gate litmus, deletion test, DQs, license
-  - https://hack.sibyllabs.org/submissions (2026-09-07): deliverables, deadline, judging
+  - https://hack.sibyllabs.org/ (2026-09-10): theme, prizes, dates, rubric, multipliers
+  - https://hack.sibyllabs.org/rules (2026-09-10): gate litmus, deletion test, DQs,
+    posts must tag @sibylcap; claimed unused stacks lose the bonus
+  - https://hack.sibyllabs.org/submissions (2026-09-10): deliverables, deadline, judging
   - https://docs.sibyllabs.org (2026-09-07): Sibyl Memory = local-first file-based,
     SQLite+FTS5, no embeddings, Python CLI + MCP, free tier, wallet/email auth
-- Critical unknowns / independent work possible: ACP testnet vs mainnet
-  (spike A); Sibyl-from-TypeScript path (spike B); ACP registration fee; all
-  code/UI/testable work independent of these
+- Critical unknowns / independent work possible: private build-page link is
+  user-held; X posting and video recording require the user; ACP/Base remain
+  NOT RUN — independent work is polish, tests, and submission copy
 
 ## Build decision
 - Competitive intel (2026-09-07, from public X posts; ~365 teams registered):
@@ -87,40 +90,37 @@
 ## Evidence
 | Criterion | Claim | Actual evidence | Judge access path | Status / limitation |
 | --- | --- | --- | --- | --- |
-| Memory load-bearing (40) | Removing Sibyl dissolves the org (no roles/routes/standards/vendor book reconstitute; tasks refused, bans forgotten) | VERIFIED via session.ts + npm test: amnesic control cannot route; real memory reconstitutes charter/roles/vendors/obligations and resumes crashed work (commits a841973+). Filmed side-by-side pending | repo test + demo video segment | Sim vendor outputs; ACP port pending |
-| Innovation (25) | Memory as the institution, not the notebook; absorbs grudge/continuity mechanics as subsystems | README memory note + architecture diagram | README | Unknown until built |
-| Execution (20) | Real escrow/payment txs on Base | tx hashes + explorer links in job log | site/console + repo | Unknown until spike A |
+| Memory load-bearing (40) | Removing Sibyl dissolves the org (no roles/routes/standards/vendor book reconstitute; tasks refused, bans forgotten) | VERIFIED via session.ts + npm test: amnesic control cannot route; real memory reconstitutes charter/roles/vendors/obligations and resumes crashed work | repo test + demo video segment | Sim vendor outputs labeled; filmed side-by-side pending |
+| Innovation (25) | Memory as the institution, not the notebook; absorbs grudge/continuity mechanics as subsystems | README "How memory made this possible" + architecture + console decision records | README + /product + /console | Built; judges still have to watch |
+| Execution (20) | Clean second-run: deletion test + honest SIM labels; no unused-stack claims | `cd agent && npm test` (24 checks); README integration table | repo + /evidence | ACP/Base NOT RUN; do not claim |
 | Pitch (15) | Fresh-session recall unmistakable | 2–5 min video, unedited restart segment with clock | demo video on build page | Unknown until recorded |
-| PMF (+10) | Multi-agent spend/quality management pain | Framing + honest positioning only; no fabricated traction | README | Do not fabricate |
-| Multiplier ×1.25 | Virtuals ACP jobs + Base settlement both real | named stacks on build page + tx evidence | build page | Unknown until spike A |
+| PMF (+10) | Multi-agent spend/quality management pain | Framing + honest positioning only; no fabricated traction | README | Default 0; do not fabricate |
+| Multiplier | Do not claim Base or Virtuals | README discloses wired-but-NOT-RUN | build page stacks field | ×1.00 accepted |
 
 ## Current execution
-- Current objective / owner: Calliope public-repository preparation; user-gated: video, posts, build page
+- Current objective / owner: freeze product; ship remaining desk polish +
+  submission copy; user records, posts, marks ready
 - Working state / verified commands and links:
-  - `cd agent && npm test` — deletion test, 24/24 VERIFIED (real processes;
-    sections: founding/ban, reconstitution/citation/pass, amnesic collapse
-    incl. no-roles refusal, crash->resume; real recall-based persistence)
-  - Teardown fixes (Sep 9): portable Sibyl discovery (no machine paths);
-    roles load-bearing (task refuses without role/* entities); model config
-    lives in role entities (`set-model`); journal-citing QA; crash/resume;
-    recall() NOT_FOUND normalization; `reset --yes` for pristine takes
-  - Site: six routes (landing, product, memory, evidence, console, about)
-    on DESIGN.md tokens; console carries found/dispatch/crash/amnesic/wipe with
-    provenance panels; running on http://localhost:3737
-  - commits: implementation history + Calliope rename/docs checkpoints; see `git log --oneline` and `REPOSITORY.md`
-- Next concrete action (user): push public repo, record demo per script
-  (crash beat included), post 2x, fill build page + mark ready before
-  Sep 10 23:59 UTC (internal 20:00 cutoff)
-- Largest current threat to placement: ×1.25 multiplier hinges on live ACP run —
-  registration + wallet funding are user-side; sim port keeps everything else honest
-- Blocker / fallback: LLM key (STUB fallback labeled); ACP pending; fallback = sim port
-- Deferred ideas / accepted scope tradeoffs: real-LLM take; real-ACP take;
-  third-party vendor hires; public console deploy (local control surface by design)
+  - Public repo: https://github.com/emmaGH1/calliope (MIT, 33+ commits)
+  - `cd agent && npm test` — deletion test, 24 checks (re-run 2026-09-10)
+  - Site: six routes + /console; uncommitted polish (wipe arm, log filter,
+    empty-state coaching, motion) completed locally and queued to push
+  - Posts drafts retagged to @sibylcap; Base/Virtuals claims removed
+- Next concrete action (user): record the demo (`docs/DEMO_SCRIPT.md`), post
+  both drafts, fill the private build page, mark ready by 20:00 UTC
+- Largest current threat to placement: no demo video / unmarked build page
+  by 23:59 UTC — not the missing ×1.25
+- Blocker / fallback: recording, X posts, and mark-ready require the user;
+  ACP/LLM remain deferred
+- Deferred ideas / accepted scope tradeoffs: live ACP hire; real-LLM take;
+  public console deploy; partner-stack multiplier
 
 ## Submission
-- Form, video/slides, README, access status: not started; build-page link held by user
-- Final commit: —
-- Required checks and any remaining failures: —
+- Form, video/slides, README, access status: repo public; README complete;
+  video not recorded; posts not published; build-page link held by user
+- Final commit: pending push of desk polish + docs
+- Required checks and any remaining failures: `cd agent && npm test` 24/24
+  (2026-09-10); desk `tsc --noEmit` 0 errors
 - Submission status / actual confirmation: not submitted
 - Required judging availability: none stated beyond access through judging (Sep 11–12)
 

@@ -37,5 +37,6 @@ on-screen timestamp**. Every simulation is labeled on screen. No fabricated data
 
 ## Upload / attach
 
-- mp4 ≤ 100 MB; name `charter-demo.mp4`; add to the private build page with this
-  repo URL and the two build-in-public posts.
+- mp4 ≤ 100 MB; name `calliope-demo.mp4`; add to the private build page with this
+  repo URL and the two build-in-public posts (tag @sibylcap; do not claim Base
+  or Virtuals).

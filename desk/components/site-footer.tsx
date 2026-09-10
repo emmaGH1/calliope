@@ -7,8 +7,8 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[var(--page-max-width)] px-6 py-16 sm:px-10">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-md">
-            <div className="flex items-center gap-3">
-              <Image src="/calliope-logo.png" alt="" width={26} height={26} />
+            <div className="flex items-center gap-4">
+              <Image src="/calliope-logo.png" alt="" width={32} height={32} />
               <span className="font-untitled-serif text-subheading font-normal">Calliope</span>
             </div>
             <p className="mt-4 text-body text-graphite">
@@ -19,11 +19,11 @@ export function SiteFooter() {
           </div>
 
           <nav aria-label="Footer" className="flex flex-col gap-3">
-            <Link href="/product" className="text-body text-graphite hover:text-off-black">Product</Link>
-            <Link href="/memory" className="text-body text-graphite hover:text-off-black">Memory</Link>
-            <Link href="/evidence" className="text-body text-graphite hover:text-off-black">Evidence</Link>
-            <Link href="/console" className="text-body text-graphite hover:text-off-black">Console</Link>
-            <Link href="/about" className="text-body text-graphite hover:text-off-black">About</Link>
+            <Link href="/product" className="press text-body text-graphite hover:text-off-black">Product</Link>
+            <Link href="/memory" className="press text-body text-graphite hover:text-off-black">Memory</Link>
+            <Link href="/evidence" className="press text-body text-graphite hover:text-off-black">Evidence</Link>
+            <Link href="/console" className="press text-body text-graphite hover:text-off-black">Console</Link>
+            <Link href="/about" className="press text-body text-graphite hover:text-off-black">About</Link>
           </nav>
 
           <div className="flex flex-col gap-3">
@@ -31,7 +31,7 @@ export function SiteFooter() {
               href="https://github.com/emmaGH1/calliope"
               target="_blank"
               rel="noreferrer"
-              className="text-body text-graphite hover:text-off-black"
+              className="press text-body text-graphite hover:text-off-black"
             >
               github.com/emmaGH1/calliope
             </a>
