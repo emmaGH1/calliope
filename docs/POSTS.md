@@ -20,8 +20,9 @@ even the obligations mid-flight.
 Delete the memory → there is no company. Every boot refounds from nothing and
 repeats the mistake the last session learned to ban.
 
-The rule is right: memory must be load-bearing. So the org itself is the
-memory — no role table, no vendor list, no policy in code.
+The rule is right: memory must be load-bearing. After founding, the live org
+state — roles, vendor book, standards, obligations — lives in Sibyl. Wipe it
+and routing collapses.
 
 What that buys you:
 • kill every process — fresh boot reconstitutes the org in seconds

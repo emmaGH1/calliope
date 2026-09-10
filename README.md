@@ -246,6 +246,10 @@ build-in-public posts, and the private build-page submission marked ready.
 The user-owned remaining actions are repository publishing, recording, posting,
 and marking ready.
 
+## Builders
+
+Solo build by Emma ([emmaGH1](https://github.com/emmaGH1) / [@_heisemma](https://x.com/_heisemma)).
+
 ## Prior work
 
 Calliope is the implementation in this repository. The author previously built

@@ -174,9 +174,9 @@ async function main() {
         print(mem, `  decision: resumed obligation ${resumable.id} from memory — the brief survived the crash`);
         result = await completeObligation(
           { mem, hire },
-          { task: resumable.task, budget: resumable.task ? budget : 3 },
+          { task: resumable.task, budget: resumable.budget },
           resumable.id,
-          []
+          decisions
         );
       } else {
         result = await runTask(mem, hire, { task: taskText, budget }, {});

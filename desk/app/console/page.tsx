@@ -266,6 +266,7 @@ export default function ConsolePage() {
           if (step === "found") void dispatch("found");
           else if (step === "crash") void dispatch("task", { crash: true });
           else if (step === "amnesic") void dispatch("amnesic-task");
+          // dispatch, recall, and resume all spawn a fresh task process
           else void dispatch("task");
         }}
       />

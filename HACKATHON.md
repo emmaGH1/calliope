@@ -60,7 +60,8 @@
 - Concept: CALLIOPE — "Your agents are employees; Calliope is the company."
   A workforce of specialist agents whose entire institution lives in Sibyl
   Memory: org charter, roles, handoff routes, client standards, vendor book,
-  in-flight obligations. Nothing org-level is hardcoded. Kill every process →
+  in-flight obligations. Founding seeds are written once, then live state is
+  recalled — wipe Sibyl and routing collapses. Kill every process →
   reboot reconstitutes the org in seconds and finishes interrupted work;
   hot-swap the model under an agent → work continues. Wipe Sibyl → no company.
   Meaningful difference vs field: GRUDGE's grudge = one table in our vendor

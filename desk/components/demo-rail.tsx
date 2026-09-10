@@ -8,7 +8,7 @@ import type { OrgEvent } from "../lib/types";
  * a narrated demonstration a judge can follow without a script.
  */
 type Step = {
-  id: "found" | "dispatch" | "crash" | "resume" | "amnesic";
+  id: "found" | "dispatch" | "recall" | "crash" | "resume" | "amnesic";
   label: string;
   hint: string;
 };
@@ -16,6 +16,7 @@ type Step = {
 const STEPS: Step[] = [
   { id: "found", label: "Found", hint: "write the org into memory" },
   { id: "dispatch", label: "Dispatch", hint: "explore, fail, ban" },
+  { id: "recall", label: "Recall", hint: "fresh pid skips the ban" },
   { id: "crash", label: "Crash", hint: "die mid-task" },
   { id: "resume", label: "Resume", hint: "finish the interrupted job" },
   { id: "amnesic", label: "Amnesic", hint: "memory stubbed: refusal" },
@@ -23,13 +24,17 @@ const STEPS: Step[] = [
 
 function completed(events: OrgEvent[]): Record<Step["id"], boolean> {
   const text = events.map((e) => e.text);
+  const banned = text.some((t) => /ban vendor cheap-and-sloppy/.test(t));
   return {
     found: events.some(
       (e) => e.kind === "founded" || e.kind === "reconstituted" || e.kind === "charter"
     ),
-    dispatch: events.some(
-      (e) => e.kind === "obligation" && /-> (atelier|cheap)/.test(e.text)
-    ),
+    // First live hire/ban — the learning session.
+    dispatch:
+      banned ||
+      events.some((e) => e.kind === "obligation" && /-> cheap/.test(e.text)),
+    // Fresh process cites the ban — the load-bearing recall beat.
+    recall: text.some((t) => /skip cheap-and-sloppy/.test(t)),
     crash: events.some((e) => e.kind === "obligation" && e.data?.crashed === true),
     resume: text.some((t) => t.includes("resumed obligation")),
     amnesic: text.some((t) => t.includes("task refused") || t.includes("attach 0 client standard")),
@@ -53,7 +58,7 @@ export function DemoRail({
       aria-label="Demo walkthrough"
       className="mt-8 overflow-x-auto rounded-3xl border border-ash"
     >
-      <ol className="flex min-w-[640px] divide-x divide-ash">
+      <ol className="flex min-w-[780px] divide-x divide-ash">
         {STEPS.map((s, i) => {
           const isDone = done[s.id];
           const isNext = i === nextIndex;

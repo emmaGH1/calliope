@@ -11,7 +11,7 @@ plus a clean recall demo is the placement path.
 
 | # | Deliverable | State | Remaining (user-side) |
 | --- | --- | --- | --- |
-| 1 | Public repo, OSI license, real commit history | READY — https://github.com/emmaGH1/calliope (public, MIT) | push remaining desk/docs commits |
+| 1 | Public repo, OSI license, real commit history | READY — https://github.com/emmaGH1/calliope (public, MIT) | — |
 | 2 | Demo video 2–5 min with fresh-session recall moment | SCRIPT READY — `docs/DEMO_SCRIPT.md` | record now (OBS/Game Bar); clock visible; sims labeled |
 | 3 | Team & partner stacks named | READY in README: Sibyl required; Virtuals/Base NOT RUN — do not claim | — |
 | 4 | Memory implementation note | READY in README (domains + read/write map + "How memory made this possible") | paste into build page |

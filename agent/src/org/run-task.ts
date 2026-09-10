@@ -61,12 +61,14 @@ export async function openObligation(
 /** Does this task have an interrupted predecessor in memory? */
 export async function findResumable(
   mem: MemoryIo
-): Promise<{ id: string; task: string; status: string } | null> {
+): Promise<{ id: string; task: string; status: string; budget: number } | null> {
   const org = new OrgMemory(mem);
   const open = (await org.listObligations()).filter(
     (o) => o.status === "in_progress"
   );
-  return open.length ? open[open.length - 1] : null;
+  if (!open.length) return null;
+  const o = open[open.length - 1];
+  return { id: o.id, task: o.task, status: o.status, budget: o.budget };
 }
 
 export async function completeObligation(
