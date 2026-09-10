@@ -7,7 +7,8 @@
     "probe": "tsx src/spikes/sibyl-probe.ts",
     "org": "tsx src/org/session.ts",
     "test": "tsx test/deletion-test.ts",
-    "probe:portable": "tsx src/spikes/portable-discovery.ts"
+    "probe:portable": "tsx src/spikes/portable-discovery.ts",
+    "test:env": "tsx src/spikes/env-compat.ts"
   },
   "keywords": [],
   "author": "",
