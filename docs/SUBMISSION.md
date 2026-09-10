@@ -3,9 +3,8 @@
 Mark-ready deadline: **Sep 10, 2026, 23:59 UTC** (internal cutoff 20:00 UTC).
 Judging Sep 11–12. Winners announced Sep 13–15.
 
-**Do not chase ACP/Base tonight.** Those stacks are wired and labeled NOT RUN.
-Claiming them without an on-camera transaction is smoke. Sibyl-only (×1.00)
-plus a clean recall demo is the placement path.
+**ACP/Virtuals aborted.** Partner stacks are optional. Sibyl-only (×1.00) is
+eligible and honest. Do not claim Base or Virtuals on the build page.
 
 ## Required deliverables (per /submissions)
 

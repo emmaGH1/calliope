@@ -99,22 +99,20 @@
 | Multiplier | Do not claim Base or Virtuals | README discloses wired-but-NOT-RUN | build page stacks field | ×1.00 accepted |
 
 ## Current execution
-- Current objective / owner: freeze product; ship remaining desk polish +
-  submission copy; user records, posts, marks ready
+- Current objective / owner: Sibyl-only submission (ACP/Virtuals aborted
+  2026-09-10 — not required; multiplier left at ×1.00)
 - Working state / verified commands and links:
-  - Public repo: https://github.com/emmaGH1/calliope (MIT, 33+ commits)
-  - `cd agent && npm test` — deletion test, 24 checks (re-run 2026-09-10)
-  - Site: six routes + /console; uncommitted polish (wipe arm, log filter,
-    empty-state coaching, motion) completed locally and queued to push
-  - Posts drafts retagged to @sibylcap; Base/Virtuals claims removed
-- Next concrete action (user): record the demo (`docs/DEMO_SCRIPT.md`), post
-  both drafts, fill the private build page, mark ready by 20:00 UTC
+  - Public repo: https://github.com/emmaGH1/calliope (MIT)
+  - `cd agent && npm test` — 24/24 (2026-09-10)
+  - Site + console ready on localhost:3737; DemoRail includes Recall
+  - Posts drafts in docs/POSTS.md tag @sibylcap; no Base/Virtuals claims
+- Next concrete action (user): record demo → post 2× → fill build page →
+  mark ready before Sep 10 23:59 UTC (internal 21:00 WAT freeze already past
+  for features; submission reserve still open to 00:59 WAT)
 - Largest current threat to placement: no demo video / unmarked build page
-  by 23:59 UTC — not the missing ×1.25
-- Blocker / fallback: recording, X posts, and mark-ready require the user;
-  ACP/LLM remain deferred
-- Deferred ideas / accepted scope tradeoffs: live ACP hire; real-LLM take;
-  public console deploy; partner-stack multiplier
+- Blocker / fallback: recording, X posts, and mark-ready are user-only
+- Deferred ideas / accepted scope tradeoffs: Virtuals ACP + Base multiplier
+  explicitly dropped; real-LLM take; public console deploy
 
 ## Submission
 - Form, video/slides, README, access status: repo public; README complete;
